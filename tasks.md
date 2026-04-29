@@ -38,4 +38,5 @@
 - [x] Create high-fidelity `Seller Dashboard` with listings, leads matching, and analytics.
 - [x] Build "Create New Listing" modal with full form validation.
 - [x] Fix `next-themes` build error and TypeScript issues across new components.
+- [x] Optimize n8n workflow: Updated API base URL and enhanced AI data extraction schema.
 
