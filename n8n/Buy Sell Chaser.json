@@ -1,0 +1,280 @@
+{
+  "name": "Buy Sell Chaser - Production",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1300,
+        32
+      ],
+      "id": "7d94807f-8606-4ccb-b412-b1d61e37cb77",
+      "name": "Schedule-Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch from all 3 collections. In n8n, this would normally be 3 separate Firebase nodes\n// concatenated. Here I'll use a Code node to represent the aggregation of our specific project structure.\n\nreturn [\n  { json: { collection: 'FreeSubscribers', frequency: '3h' } },\n  { json: { collection: 'PrioritySubscribers', frequency: '1h' } },\n  { json: { collection: 'PremiumSubscribers', frequency: '15m' } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1080,
+        32
+      ],
+      "id": "24c20b25-ad76-4ff4-8047-a35fbf6745d2",
+      "name": "Get-Tier-Settings"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "10567928-b241-419d-822e-16fa32072a0f",
+              "leftValue": "={{ $json.userType }}",
+              "rightValue": "buyer",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -720,
+        32
+      ],
+      "id": "6c7cdea1-69cb-4e01-a1c6-02b5f8d78f05",
+      "name": "Buyer-Or-Seller"
+    },
+    {
+      "parameters": {},
+      "id": "be716414-611a-43ae-aeee-9d1fa3abf915",
+      "name": "Loop Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let queries = [];\n\nfor (const item of $input.all()) {\n  const user = item.json;\n  const interests = user.interestedItems || [];\n  const locations = user.interestedLocations || [];\n\n  for (const product of interests) {\n    for (const location of locations) {\n      queries.push({\n        json: {\n          query: `${product} for sale in ${location}`,\n          product,\n          location,\n          user: {\n            fullName: user.fullName,\n            email: user.email,\n            userType: user.userType,\n            plan: user.plan\n          }\n        }\n      });\n    }\n  }\n}\n\nreturn queries;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        144
+      ],
+      "id": "79dd3dfc-ecc1-4829-af89-0998196953f1",
+      "name": "Extract-Interested-Items"
+    },
+    {
+      "parameters": {
+        "q": "={{ $json.query }}",
+        "location": "={{ $json.location }}",
+        "additionalFields": {
+          "as_epq": "={{ $json.product }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApi",
+      "typeVersion": 1,
+      "position": [
+        528,
+        176
+      ],
+      "id": "5c1db863-bc79-461f-b948-f033e222e3a8",
+      "name": "Search-Google"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        224,
+        133
+      ],
+      "id": "287ef5d8-4a13-4f6a-a716-bdb257f62ec2",
+      "name": "Loop Over Interests"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "a2aafc2f-75b8-4659-9ccc-c30fab58947a",
+      "name": "Loop Over Users",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -304,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const userContext = $(\"Extract-Interested-Items\").first().json.user;\n\nconst groups = {};\n\nfor (const item of $input.all()) {\n  const json = item.json || {};\n  const email = userContext.email;\n\n  if (!groups[email]) {\n    groups[email] = {\n      userEmail: email,\n      results: []\n    };\n  }\n\n  const organic = item.json.organic_results || [];\n  groups[email].results.push(...organic.map(r => ({ ...r, category: item.json.product })));\n}\n\nreturn Object.values(groups).map(g => ({ json: g }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        0
+      ],
+      "id": "ba5f78d9-1296-4988-a06d-1be297cf3a2f",
+      "name": "Aggregate-Search-Results"
+    },
+    {
+      "parameters": {
+        "jsCode": "let items = [];\nfor (const item of $input.all()) {\n  const { results, userEmail } = item.json;\n  results.slice(0, 5).forEach((result) => {\n    items.push({ json: { userEmail, link: result.link, category: result.category } });\n  });\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        0
+      ],
+      "id": "38ca1ae7-a0c9-4a52-94ce-29d32a4b2d41",
+      "name": "Convert-To-Individual-Links"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract product data from this HTML. \n\nTarget Category: {{ $json.category }}\nHTML Snippet: {{ $json.content.substring(0, 15000) }}",
+        "options": {
+          "systemMessage": "You are a specialized Data Extraction Agent for BuyMyInterests.ai.\n\nYour task is to extract high-quality structured data from the provided HTML for a specific category: Pets, Cars, Houses, or Plots.\n\nRULES:\n1. Output ONLY a valid JSON array of objects inside an 'items' key.\n2. Do NOT use markdown code blocks.\n3. If no relevant items are found, return {\"items\": []}.\n\nJSON STRUCTURE:\n{\n  \"items\": [\n    {\n      \"title\": \"string\",\n      \"price\": number,\n      \"description\": \"string\",\n      \"imageUrl\": \"string\",\n      \"sourceUrl\": \"string\",\n      \"metadata\": {\n         // Category specific fields\n         \"color\": \"string\",\n         \"breed\": \"string (for pets)\",\n         \"mileage\": \"string (for cars)\",\n         \"year\": \"string (for cars)\",\n         \"rooms\": \"string (for houses)\",\n         \"area\": \"string (for plots)\",\n         \"condition\": \"New/Used\"\n      }\n    }\n  ]\n}\n\nBe extremely precise with prices. Convert strings like '$20,000' to the number 20000."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1360,
+        48
+      ],
+      "id": "80424e10-e73c-488a-a7f2-6297089cfd95",
+      "name": "Intelligence-Extractor"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        928,
+        -128
+      ],
+      "id": "9591f469-5dc8-4942-87fc-ca7fdf690843",
+      "name": "Loop Over Links"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.link }}",
+        "options": {},
+        "formats": [
+          "html"
+        ]
+      },
+      "type": "n8n-nodes-browserless-api.browserless",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        -48
+      ],
+      "id": "d66d9fe0-f3ad-45e5-8370-f9535d85b3d3",
+      "name": "Scrape-Page"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        288
+      ],
+      "id": "ae350ee6-f03b-45bf-8e8d-34b2d07c118f",
+      "name": "AI-Model"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://buymyinterests.ai/api/v1/update-matches",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "your_secret_n8n_key_12345"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userEmail",
+              "value": "={{ $(\"Convert-To-Individual-Links\").item.json.userEmail }}"
+            },
+            {
+              "name": "matches",
+              "value": "={{ $json.items }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1720,
+        48
+      ],
+      "id": "httpRequest-node-id",
+      "name": "Push-To-Website"
+    }
+  ],
+  "connections": {
+    "Schedule-Trigger": { "main": [[{ "node": "Get-Tier-Settings", "type": "main", "index": 0 }]] },
+    "Get-Tier-Settings": { "main": [[{ "node": "Buyer-Or-Seller", "type": "main", "index": 0 }]] },
+    "Buyer-Or-Seller": { "main": [[{ "node": "Loop Over Users", "type": "main", "index": 0 }]] },
+    "Loop Over Users": { "main": [[{ "node": "Loop Complete", "type": "main", "index": 0 }], [{ "node": "Extract-Interested-Items", "type": "main", "index": 0 }]] },
+    "Extract-Interested-Items": { "main": [[{ "node": "Loop Over Interests", "type": "main", "index": 0 }]] },
+    "Loop Over Interests": { "main": [[{ "node": "Loop Over Users", "type": "main", "index": 0 }], [{ "node": "Search-Google", "type": "main", "index": 0 }]] },
+    "Search-Google": { "main": [[{ "node": "Loop Over Interests", "type": "main", "index": 0 }]] },
+    "Loop Complete": { "main": [[{ "node": "Aggregate-Search-Results", "type": "main", "index": 0 }]] },
+    "Aggregate-Search-Results": { "main": [[{ "node": "Convert-To-Individual-Links", "type": "main", "index": 0 }]] },
+    "Convert-To-Individual-Links": { "main": [[{ "node": "Loop Over Links", "type": "main", "index": 0 }]] },
+    "Loop Over Links": { "main": [[], [{ "node": "Scrape-Page", "type": "main", "index": 0 }]] },
+    "Scrape-Page": { "main": [[{ "node": "Intelligence-Extractor", "type": "main", "index": 0 }]] },
+    "Intelligence-Extractor": { "main": [[{ "node": "Push-To-Website", "type": "main", "index": 0 }]] },
+    "AI-Model": { "ai_languageModel": [[{ "node": "Intelligence-Extractor", "type": "ai_languageModel", "index": 0 }]] }
+  }
+}
