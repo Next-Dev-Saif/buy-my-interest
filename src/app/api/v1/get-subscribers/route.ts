@@ -36,6 +36,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ 
       success: true, 
       count: subscribers.length,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID, // Debug: verify which project we are hitting
       data: subscribers 
     });
 
