@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/config/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { adminDb } from "@/config/firebase-admin";
 
 /**
  * API Route for n8n to fetch subscribers/users based on collection tier.
@@ -24,9 +23,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Collection name is required" }, { status: 400 });
     }
 
-    // 2. Fetch from Firestore
-    const colRef = collection(db, collectionName);
-    const snapshot = await getDocs(colRef);
+    // 2. Fetch from Firestore using Admin SDK (bypasses security rules)
+    const snapshot = await adminDb.collection(collectionName).get();
     
     const subscribers = snapshot.docs.map(doc => ({
       id: doc.id,
@@ -39,7 +37,13 @@ export async function GET(request: Request) {
       debug: {
         queriedCollection: `"${collectionName}"`,
         snapshotSize: snapshot.size,
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        config: {
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+          authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+          storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+          hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+          hasAppId: !!process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+        }
       },
       data: subscribers 
     });
