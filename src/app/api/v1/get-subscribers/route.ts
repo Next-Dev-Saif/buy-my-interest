@@ -11,8 +11,13 @@ import { adminDb } from "@/config/firebase-admin";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const collectionName = searchParams.get("collection");
+    let collectionName = searchParams.get("collection");
     const apiKey = request.headers.get("X-API-KEY");
+
+    // Sanitize: Remove any accidental quotes (single or double) from the collection name
+    if (collectionName) {
+      collectionName = collectionName.replace(/^["']|["']$/g, "").trim();
+    }
 
     // 1. Validate API Key
     if (apiKey !== process.env.N8N_API_KEY) {
@@ -24,7 +29,11 @@ export async function GET(request: Request) {
     }
 
     // 2. Fetch from Firestore using Admin SDK (bypasses security rules)
-    const snapshot = await adminDb.collection(collectionName).get();
+    let query = adminDb.collection(collectionName);
+    
+    // Add pagination/limit support to prevent overloading
+    const limit = parseInt(searchParams.get("limit") || "100");
+    const snapshot = await query.limit(limit).get();
     
     const subscribers = snapshot.docs.map(doc => ({
       id: doc.id,

@@ -43,6 +43,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    scrollbar-gutter: stable;
     @apply antialiased selection:bg-primary/20;
   }
 }
@@ -51,8 +52,20 @@
   .glass {
     @apply bg-card/70 backdrop-blur-md border border-white/10 shadow-xl;
   }
+
+  .glass-dark {
+    @apply bg-slate-950/60 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
   
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

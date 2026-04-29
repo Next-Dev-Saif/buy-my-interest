@@ -4,35 +4,110 @@
     {
       "parameters": {
         "rule": {
-          "interval": [
-            {
-              "field": "hours",
-              "hoursInterval": 1
-            }
-          ]
+          "interval": [{ "field": "minutes", "minutesInterval": 15 }]
         }
       },
       "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.3,
-      "position": [
-        -1300,
-        32
-      ],
-      "id": "7d94807f-8606-4ccb-b412-b1d61e37cb77",
-      "name": "Schedule-Trigger"
+      "typeVersion": 1.1,
+      "position": [-1500, -200],
+      "id": "trigger-premium-id",
+      "name": "Trigger-Premium-15m"
     },
     {
       "parameters": {
-        "jsCode": "// Fetch from all 3 collections. In n8n, this would normally be 3 separate Firebase nodes\n// concatenated. Here I'll use a Code node to represent the aggregation of our specific project structure.\n\nreturn [\n  { json: { collection: 'FreeSubscribers', frequency: '3h' } },\n  { json: { collection: 'PrioritySubscribers', frequency: '1h' } },\n  { json: { collection: 'PremiumSubscribers', frequency: '15m' } }\n];"
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 1 }]
+        }
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -1080,
-        32
-      ],
-      "id": "24c20b25-ad76-4ff4-8047-a35fbf6745d2",
-      "name": "Get-Tier-Settings"
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-1500, 0],
+      "id": "trigger-priority-id",
+      "name": "Trigger-Priority-1h"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 4 }]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-1500, 200],
+      "id": "trigger-free-id",
+      "name": "Trigger-Free-4h"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://buy-my-interest.vercel.app/api/v1/get-subscribers",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "X-API-KEY", "value": "your_secret_n8n_key_12345" }
+          ]
+        },
+        "sendQueryParameters": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "collection", "value": "PremiumSubscribers" },
+            { "name": "limit", "value": "50" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [-1250, -200],
+      "id": "fetch-premium-id",
+      "name": "Fetch-Premium"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://buy-my-interest.vercel.app/api/v1/get-subscribers",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "X-API-KEY", "value": "your_secret_n8n_key_12345" }
+          ]
+        },
+        "sendQueryParameters": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "collection", "value": "PrioritySubscribers" },
+            { "name": "limit", "value": "30" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [-1250, 0],
+      "id": "fetch-priority-id",
+      "name": "Fetch-Priority"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://buy-my-interest.vercel.app/api/v1/get-subscribers",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "X-API-KEY", "value": "your_secret_n8n_key_12345" }
+          ]
+        },
+        "sendQueryParameters": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "collection", "value": "FreeSubscribers" },
+            { "name": "limit", "value": "10" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [-1250, 200],
+      "id": "fetch-free-id",
+      "name": "Fetch-Free"
     },
     {
       "parameters": {
@@ -60,45 +135,19 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
-      "position": [
-        -700,
-        32
-      ],
+      "position": [-700, 32],
       "id": "6c7cdea1-69cb-4e01-a1c6-02b5f8d78f05",
       "name": "Buyer-Or-Seller"
     },
     {
       "parameters": {
-        "method": "GET",
-        "url": "https://buy-my-interest.vercel.app/api/v1/get-subscribers",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "X-API-KEY",
-              "value": "your_secret_n8n_key_12345"
-            }
-          ]
-        },
-        "sendQueryParameters": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "collection",
-              "value": "={{ $json.collection }}"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "return $input.all().flatMap(item => \n  item.json.data.map(subscriber => ({ json: subscriber }))\n);"
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -900,
-        32
-      ],
-      "id": "fetch-users-api-id",
-      "name": "Fetch-Users-From-API"
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1000, 32],
+      "id": "flatten-subscribers-id",
+      "name": "Flatten-Subscribers"
     },
     {
       "parameters": {},
@@ -106,10 +155,7 @@
       "name": "Loop Complete",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [
-        224,
-        0
-      ]
+      "position": [224, 0]
     },
     {
       "parameters": {
@@ -117,10 +163,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        -80,
-        144
-      ],
+      "position": [-80, 144],
       "id": "79dd3dfc-ecc1-4829-af89-0998196953f1",
       "name": "Extract-Interested-Items"
     },
@@ -135,10 +178,7 @@
       },
       "type": "n8n-nodes-serpapi.serpApi",
       "typeVersion": 1,
-      "position": [
-        528,
-        176
-      ],
+      "position": [528, 176],
       "id": "5c1db863-bc79-461f-b948-f033e222e3a8",
       "name": "Search-Google"
     },
@@ -148,10 +188,7 @@
       },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [
-        224,
-        133
-      ],
+      "position": [224, 133],
       "id": "287ef5d8-4a13-4f6a-a716-bdb257f62ec2",
       "name": "Loop Over Interests"
     },
@@ -165,10 +202,7 @@
       "name": "Loop Over Users",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [
-        -304,
-        16
-      ]
+      "position": [-304, 16]
     },
     {
       "parameters": {
@@ -176,10 +210,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        496,
-        0
-      ],
+      "position": [496, 0],
       "id": "ba5f78d9-1296-4988-a06d-1be297cf3a2f",
       "name": "Aggregate-Search-Results"
     },
@@ -189,10 +220,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        704,
-        0
-      ],
+      "position": [704, 0],
       "id": "38ca1ae7-a0c9-4a52-94ce-29d32a4b2d41",
       "name": "Convert-To-Individual-Links"
     },
@@ -206,10 +234,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
-      "position": [
-        1360,
-        48
-      ],
+      "position": [1360, 48],
       "id": "80424e10-e73c-488a-a7f2-6297089cfd95",
       "name": "Intelligence-Extractor"
     },
@@ -219,10 +244,7 @@
       },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [
-        928,
-        -128
-      ],
+      "position": [928, -128],
       "id": "9591f469-5dc8-4942-87fc-ca7fdf690843",
       "name": "Loop Over Links"
     },
@@ -230,16 +252,11 @@
       "parameters": {
         "url": "={{ $json.link }}",
         "options": {},
-        "formats": [
-          "html"
-        ]
+        "formats": ["html"]
       },
       "type": "n8n-nodes-browserless-api.browserless",
       "typeVersion": 1,
-      "position": [
-        1168,
-        -48
-      ],
+      "position": [1168, -48],
       "id": "d66d9fe0-f3ad-45e5-8370-f9535d85b3d3",
       "name": "Scrape-Page"
     },
@@ -249,10 +266,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
       "typeVersion": 1,
-      "position": [
-        1344,
-        288
-      ],
+      "position": [1344, 288],
       "id": "ae350ee6-f03b-45bf-8e8d-34b2d07c118f",
       "name": "AI-Model"
     },
@@ -266,10 +280,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
-      "position": [
-        1540,
-        48
-      ],
+      "position": [1540, 48],
       "id": "json-repairer-id",
       "name": "JSON-Repairer"
     },
@@ -303,30 +314,90 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        1820,
-        48
-      ],
+      "position": [1820, 48],
       "id": "httpRequest-node-id",
       "name": "Push-To-Website"
     }
   ],
   "connections": {
-    "Schedule-Trigger": { "main": [[{ "node": "Get-Tier-Settings", "type": "main", "index": 0 }]] },
-    "Get-Tier-Settings": { "main": [[{ "node": "Fetch-Users-From-API", "type": "main", "index": 0 }]] },
-    "Fetch-Users-From-API": { "main": [[{ "node": "Buyer-Or-Seller", "type": "main", "index": 0 }]] },
-    "Buyer-Or-Seller": { "main": [[{ "node": "Loop Over Users", "type": "main", "index": 0 }]] },
-    "Loop Over Users": { "main": [[{ "node": "Loop Complete", "type": "main", "index": 0 }], [{ "node": "Extract-Interested-Items", "type": "main", "index": 0 }]] },
-    "Extract-Interested-Items": { "main": [[{ "node": "Loop Over Interests", "type": "main", "index": 0 }]] },
-    "Loop Over Interests": { "main": [[{ "node": "Loop Over Users", "type": "main", "index": 0 }], [{ "node": "Search-Google", "type": "main", "index": 0 }]] },
-    "Search-Google": { "main": [[{ "node": "Loop Over Interests", "type": "main", "index": 0 }]] },
-    "Loop Complete": { "main": [[{ "node": "Aggregate-Search-Results", "type": "main", "index": 0 }]] },
-    "Aggregate-Search-Results": { "main": [[{ "node": "Convert-To-Individual-Links", "type": "main", "index": 0 }]] },
-    "Convert-To-Individual-Links": { "main": [[{ "node": "Loop Over Links", "type": "main", "index": 0 }]] },
-    "Loop Over Links": { "main": [[], [{ "node": "Scrape-Page", "type": "main", "index": 0 }]] },
-    "Scrape-Page": { "main": [[{ "node": "Intelligence-Extractor", "type": "main", "index": 0 }]] },
-    "Intelligence-Extractor": { "main": [[{ "node": "JSON-Repairer", "type": "main", "index": 0 }]] },
-    "JSON-Repairer": { "main": [[{ "node": "Push-To-Website", "type": "main", "index": 0 }]] },
-    "AI-Model": { "ai_languageModel": [[{ "node": "Intelligence-Extractor", "type": "ai_languageModel", "index": 0 }, { "node": "JSON-Repairer", "type": "ai_languageModel", "index": 0 }]] }
+    "Trigger-Premium-15m": {
+      "main": [[{ "node": "Fetch-Premium", "type": "main", "index": 0 }]]
+    },
+    "Trigger-Priority-1h": {
+      "main": [[{ "node": "Fetch-Priority", "type": "main", "index": 0 }]]
+    },
+    "Trigger-Free-4h": {
+      "main": [[{ "node": "Fetch-Free", "type": "main", "index": 0 }]]
+    },
+    "Fetch-Premium": {
+      "main": [[{ "node": "Flatten-Subscribers", "type": "main", "index": 0 }]]
+    },
+    "Fetch-Priority": {
+      "main": [[{ "node": "Flatten-Subscribers", "type": "main", "index": 0 }]]
+    },
+    "Fetch-Free": {
+      "main": [[{ "node": "Flatten-Subscribers", "type": "main", "index": 0 }]]
+    },
+    "Flatten-Subscribers": {
+      "main": [[{ "node": "Buyer-Or-Seller", "type": "main", "index": 0 }]]
+    },
+    "Buyer-Or-Seller": {
+      "main": [[{ "node": "Loop Over Users", "type": "main", "index": 0 }]]
+    },
+    "Loop Over Users": {
+      "main": [
+        [{ "node": "Loop Complete", "type": "main", "index": 0 }],
+        [{ "node": "Extract-Interested-Items", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract-Interested-Items": {
+      "main": [[{ "node": "Loop Over Interests", "type": "main", "index": 0 }]]
+    },
+    "Loop Over Interests": {
+      "main": [
+        [{ "node": "Loop Over Users", "type": "main", "index": 0 }],
+        [{ "node": "Search-Google", "type": "main", "index": 0 }]
+      ]
+    },
+    "Search-Google": {
+      "main": [[{ "node": "Loop Over Interests", "type": "main", "index": 0 }]]
+    },
+    "Loop Complete": {
+      "main": [
+        [{ "node": "Aggregate-Search-Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Aggregate-Search-Results": {
+      "main": [
+        [{ "node": "Convert-To-Individual-Links", "type": "main", "index": 0 }]
+      ]
+    },
+    "Convert-To-Individual-Links": {
+      "main": [[{ "node": "Loop Over Links", "type": "main", "index": 0 }]]
+    },
+    "Loop Over Links": {
+      "main": [[], [{ "node": "Scrape-Page", "type": "main", "index": 0 }]]
+    },
+    "Scrape-Page": {
+      "main": [[{ "node": "Intelligence-Extractor", "type": "main", "index": 0 }]]
+    },
+    "Intelligence-Extractor": {
+      "main": [[{ "node": "JSON-Repairer", "type": "main", "index": 0 }]]
+    },
+    "JSON-Repairer": {
+      "main": [[{ "node": "Push-To-Website", "type": "main", "index": 0 }]]
+    },
+    "AI-Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Intelligence-Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          { "node": "JSON-Repairer", "type": "ai_languageModel", "index": 0 }
+        ]
+      ]
+    }
   }
 }

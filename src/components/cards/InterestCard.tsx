@@ -1,6 +1,5 @@
-import { MapPin, DollarSign, Calendar, ExternalLink, Sparkles, Navigation } from "lucide-react";
+import { MapPin, Clock } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 export interface InterestResult {
   id: string;
@@ -9,7 +8,7 @@ export interface InterestResult {
   location: string;
   category: string;
   imageUrl: string;
-  link: string;
+  sourceUrl: string;
   dateScraped: string;
 }
 
@@ -18,67 +17,78 @@ interface InterestCardProps {
 }
 
 export default function InterestCard({ data }: InterestCardProps) {
+  const formattedPrice =
+    data.price.includes("$") || data.price.toLowerCase().includes("rs")
+      ? data.price
+      : `Rs. ${parseInt(data.price).toLocaleString()}`;
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      className="glass rounded-[2rem] overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-white/5 hover:border-primary/30 shadow-xl"
-    >
-      <div className="relative h-56 w-full bg-black/20 overflow-hidden">
+    <div className="group flex flex-col h-full rounded-2xl overflow-hidden border border-border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-all duration-300">
+      {/* Image */}
+      <div className="relative h-56 w-full overflow-hidden">
         {data.imageUrl ? (
           <Image
             src={data.imageUrl}
             alt={data.title}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full bg-primary/5 flex items-center justify-center">
-            <Sparkles className="w-8 h-8 text-primary/20" />
+          <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-muted-foreground">
+            No Image
           </div>
         )}
-        
-        {/* Category Badge */}
-        <div className="absolute top-4 left-4 px-4 py-1.5 glass border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-xl">
+
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent dark:from-black/70" />
+
+        {/* Category */}
+        <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium bg-background/70 text-foreground backdrop-blur-md border border-border">
           {data.category}
         </div>
 
-        {/* Date Badge */}
-        <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/40 backdrop-blur-md border-white/10 rounded-lg text-[9px] font-bold text-white/70">
-          <Calendar className="w-3 h-3 inline mr-1 opacity-50" /> {data.dateScraped}
+        {/* Date */}
+        <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-md text-xs flex items-center gap-1 bg-background/70 text-muted-foreground backdrop-blur-md border border-border">
+          <Clock className="w-3.5 h-3.5" />
+          {data.dateScraped}
         </div>
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
 
-      <div className="p-6 space-y-4">
-        <div className="space-y-2">
-          <h3 className="font-bold text-xl line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-5">
+        {/* Top section */}
+        <div className="space-y-4 mb-3">
+          <h3 className="text-lg font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors">
             {data.title}
           </h3>
-          <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium">
-            <MapPin className="w-3.5 h-3.5" />
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <MapPin className="w-4 h-4" />
             <span className="line-clamp-1">{data.location}</span>
           </div>
         </div>
-        
-        <div className="flex items-center justify-between items-end pt-2">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-black text-foreground/30 uppercase tracking-widest">Market Price</span>
-            <span className="text-2xl font-black text-primary tracking-tighter">{data.price}</span>
+
+        {/* Bottom pinned section */}
+        <div className="mt-auto pt-4 border-t border-border flex items-center justify-between">
+          {/* Price */}
+          <div>
+            <p className="text-xs text-muted-foreground">Price</p>
+            <p className="text-xl font-semibold tracking-tight">
+              {formattedPrice}
+            </p>
           </div>
-          
+
+          {/* Action */}
           <a
-            href={data.link}
+            href={data.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/10"
+            className="flex items-center justify-center bg-primary text-primary-foreground px-4 py-2.5 rounded-full hover:opacity-90 transition active:scale-95"
           >
-            <Navigation className="w-5 h-5" />
+            Lets Go
           </a>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
