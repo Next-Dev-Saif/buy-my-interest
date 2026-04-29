@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +24,14 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+/**
+ * InterestForm Component
+ * 
+ * A multi-step onboarding wizard for both Buyers and Sellers.
+ * Handles user type selection, profile creation, category interests, and location targeting.
+ * 
+ * @returns {JSX.Element} The multi-step form interface.
+ */
 export default function InterestForm() {
   const router = useRouter();
   const { theme } = useTheme();
@@ -54,6 +62,15 @@ export default function InterestForm() {
   const selectedItems = watch("interestedItems");
   const selectedLocations = watch("interestedLocations") || [];
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get("role");
+    if (role === "buyer" || role === "seller") {
+      setValue("userType", role as "buyer" | "seller");
+      setStep(1);
+    }
+  }, [setValue]);
+
   const handleNext = async () => {
     if (step === 0) {
       setStep(1);
@@ -77,6 +94,10 @@ export default function InterestForm() {
       setValue("interestedLocations", [...selectedLocations, val], { shouldValidate: true });
     }
     setLocationInput("");
+  };
+  
+  const removeLocation = (loc: string) => {
+    setValue("interestedLocations", selectedLocations.filter((l) => l !== loc), { shouldValidate: true });
   };
 
   const toggleItem = (item: string) => {

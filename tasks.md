@@ -1,7 +1,6 @@
 # Implementation Plan: BuyMyInterests.ai
 
 ## Pending Tasks
-- [ ] Seller Flow: To be provided later.
 - [ ] Integrate actual Google Places Autocomplete API when API key is available.
 
 ## In Progress
@@ -32,3 +31,11 @@
 - [x] Create filtering and search UI (Sidebar or Top bar).
 - [x] Implement logic to fetch user's scraped results from Firestore based on email (with fallback mock data).
 - [x] Add loading skeletons and empty states.
+
+### 5. Seller Flow
+- [x] Implement Seller Landing Page (`/seller`) with high-tech aesthetic.
+- [x] Implement Multi-step onboarding for Sellers in `InterestForm` (Role-based entry via query params).
+- [x] Create high-fidelity `Seller Dashboard` with listings, leads matching, and analytics.
+- [x] Build "Create New Listing" modal with full form validation.
+- [x] Fix `next-themes` build error and TypeScript issues across new components.
+
