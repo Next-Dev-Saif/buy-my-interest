@@ -10,6 +10,7 @@ export interface InterestResult {
   imageUrl: string;
   sourceUrl: string;
   dateScraped: string;
+  timestamp: number;
 }
 
 interface InterestCardProps {

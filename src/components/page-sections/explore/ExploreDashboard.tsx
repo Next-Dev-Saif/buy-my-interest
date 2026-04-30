@@ -67,71 +67,6 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
           } as InterestResult);
         });
 
-        // Mock data if empty for demo purposes during development
-        if (data.length === 0) {
-          setTimeout(() => {
-            setResults([
-              {
-                id: "1",
-                title: "Adorable Golden Retriever Puppy",
-                price: "1200",
-                location: "Islamabad, PK",
-                category: "Pets",
-                imageUrl:
-                  "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=800",
-                link: "#",
-                dateScraped: new Date().toLocaleDateString(),
-              },
-              {
-                id: "2",
-                title: "Vintage 1969 Ford Mustang",
-                price: "45000",
-                location: "Islamabad, PK",
-                category: "Cars",
-                imageUrl:
-                  "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&q=80&w=800",
-                link: "#",
-                dateScraped: new Date().toLocaleDateString(),
-              },
-              {
-                id: "3",
-                title: "Premium Persian Kitten",
-                price: "800",
-                location: "Lahore, PK",
-                category: "Pets",
-                imageUrl:
-                  "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=800",
-                link: "#",
-                dateScraped: new Date().toLocaleDateString(),
-              },
-              {
-                id: "4",
-                title: "Modern 5 Marla House",
-                price: "150000",
-                location: "Rawalpindi, PK",
-                category: "Houses",
-                imageUrl:
-                  "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=800",
-                link: "#",
-                dateScraped: new Date().toLocaleDateString(),
-              },
-              {
-                id: "5",
-                title: "Honda Civic 2022 Turbo",
-                price: "32000",
-                location: "Karachi, PK",
-                category: "Cars",
-                imageUrl:
-                  "https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&q=80&w=800",
-                link: "#",
-                dateScraped: new Date().toLocaleDateString(),
-              },
-            ]);
-            setLoading(false);
-          }, 1500);
-          return;
-        }
-
         setResults(data);
       } catch (error) {
         console.error("Error fetching results", error);
@@ -177,8 +112,8 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         return parsePrice(b.price) - parsePrice(a.price);
 
       // Default: Newest first (client-side sort to avoid Firestore index)
-      const dateA = a.timestamp?.seconds || 0;
-      const dateB = b.timestamp?.seconds || 0;
+      const dateA = new Date(a.timestamp).getTime();
+      const dateB = new Date(b.timestamp).getTime();
       return dateB - dateA;
     });
   }, [results, searchTerm, selectedCategory, minPrice, maxPrice, sortBy]);
