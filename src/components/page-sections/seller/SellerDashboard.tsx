@@ -115,53 +115,49 @@ export default function SellerDashboard() {
   };
 
   return (
-    <div className="space-y-12">
-      {/* Dashboard Header */}
+    <div className="space-y-10">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-bold text-purple-400 uppercase tracking-widest mb-4"
-          >
-            <Zap className="w-3 h-3" /> Seller Portal
-          </motion.div>
-          <h1 className="text-4xl lg:text-5xl font-black tracking-tight">
-            Dashboard
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-lg bg-primary/5 border border-primary/10 text-[10px] font-bold text-primary uppercase tracking-wider mb-2">
+            Marketplace Partner
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Seller Dashboard
           </h1>
-          <p className="text-foreground/60 mt-2 text-lg">
-            Manage your assets and connect with qualified buyers.
+          <p className="text-secondary text-sm font-medium">
+            Manage your inventory and connect with qualified buyers globally.
           </p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-md active:scale-95"
         >
-          <Plus className="w-5 h-5" /> Create New Listing
+          <Plus className="w-4 h-4" /> Create Listing
         </button>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Active Listings", value: "12", icon: Tag, color: "text-blue-400", bg: "bg-blue-400/10" },
-          { label: "Total Reach", value: "2.4k", icon: TrendingUp, color: "text-green-400", bg: "bg-green-400/10" },
-          { label: "Direct Leads", value: "48", icon: Users, color: "text-purple-400", bg: "bg-purple-400/10" },
-          { label: "Conversion", value: "4.2%", icon: Zap, color: "text-amber-400", bg: "bg-amber-400/10" },
+          { label: "Active Listings", value: "12", icon: Tag, color: "text-red-600", bg: "bg-red-50" },
+          { label: "Market Reach", value: "2,405", icon: TrendingUp, color: "text-rose-600", bg: "bg-rose-50" },
+          { label: "Qualified Leads", value: "48", icon: Users, color: "text-red-700", bg: "bg-red-50" },
+          { label: "Conversion Rate", value: "4.2%", icon: Zap, color: "text-rose-800", bg: "bg-rose-50" },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="glass p-6 rounded-3xl border border-white/5 space-y-4"
+            transition={{ delay: i * 0.05 }}
+            className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-4"
           >
-            <div className={`w-12 h-12 rounded-2xl ${stat.bg} flex items-center justify-center`}>
-              <stat.icon className={`w-6 h-6 ${stat.color}`} />
+            <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center text-current`}>
+              <stat.icon className={`w-5 h-5 ${stat.color}`} />
             </div>
             <div>
-              <p className="text-sm font-bold text-foreground/40 uppercase tracking-wider">{stat.label}</p>
-              <h3 className="text-3xl font-black mt-1">{stat.value}</h3>
+              <p className="text-[10px] font-bold text-secondary uppercase tracking-wider">{stat.label}</p>
+              <h3 className="text-2xl font-bold text-foreground mt-0.5">{stat.value}</h3>
             </div>
           </motion.div>
         ))}
@@ -170,88 +166,92 @@ export default function SellerDashboard() {
       {/* Main Content Area */}
       <div className="grid lg:grid-cols-12 gap-8 items-start">
         
-        {/* Navigation Sidebar (Mobile Top bar) */}
+        {/* Navigation Sidebar */}
         <div className="lg:col-span-3 flex lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 hide-scrollbar">
           {[
-            { id: "listings", label: "My Listings", icon: Tag },
-            { id: "leads", label: "Potential Leads", icon: Users },
-            { id: "analytics", label: "Performance", icon: TrendingUp },
-            { id: "settings", label: "Portal Settings", icon: LayoutDashboard },
+            { id: "listings", label: "My Inventory", icon: Tag },
+            { id: "leads", label: "Direct Leads", icon: Users },
+            { id: "analytics", label: "Market Insights", icon: TrendingUp },
+            { id: "settings", label: "Settings", icon: LayoutDashboard },
           ].map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all whitespace-nowrap lg:w-full ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap lg:w-full border ${
                 activeTab === item.id 
-                ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]" 
-                : "glass border border-white/5 text-foreground/60 hover:bg-white/5"
+                ? "bg-primary text-white border-primary shadow-sm" 
+                : "bg-card border-border text-secondary hover:border-primary/50"
               }`}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className="w-4 h-4" />
               {item.label}
             </button>
           ))}
         </div>
 
         {/* Content Panel */}
-        <div className="lg:col-span-9 glass rounded-[2.5rem] border border-white/10 overflow-hidden min-h-[600px]">
+        <div className="lg:col-span-9 bg-card rounded-xl border border-border shadow-sm overflow-hidden min-h-[500px]">
           <AnimatePresence mode="wait">
             {activeTab === "listings" && (
               <motion.div
                 key="listings"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="p-8 space-y-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="p-6 md:p-8 space-y-6"
               >
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-black">Active Inventory</h2>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <h2 className="text-xl font-bold text-foreground">Active Inventory</h2>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary" />
                     <input 
                       type="text" 
-                      placeholder="Search listings..." 
-                      className="bg-background border border-border rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      placeholder="Search inventory..." 
+                      className="bg-background border border-border rounded-lg pl-9 pr-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-full sm:w-64"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {mockListings.map((listing) => (
                     <div 
                       key={listing.id}
-                      className="group flex flex-col sm:flex-row items-center gap-6 p-4 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
+                      className="flex flex-col sm:flex-row items-center gap-5 p-3 rounded-xl border border-border hover:bg-muted/30 transition-all group"
                     >
-                      <div className="relative w-full sm:w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0">
+                      <div className="relative w-full sm:w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 border border-border">
                         <Image src={listing.image} alt={listing.title} fill className="object-cover" />
                       </div>
                       <div className="flex-grow space-y-1 text-center sm:text-left">
-                        <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-                          <span className="px-2 py-0.5 rounded-md bg-green-500/20 text-green-400 text-[10px] font-black uppercase tracking-tighter">
+                        <div className="flex items-center justify-center sm:justify-start gap-2 mb-0.5">
+                          <span className="px-1.5 py-0.5 rounded bg-red-50 text-primary text-[9px] font-bold uppercase tracking-wider">
                             {listing.status}
                           </span>
-                          <span className="text-foreground/40 text-xs font-bold">{listing.category}</span>
+                          <span className="text-secondary text-[10px] font-bold uppercase">{listing.category}</span>
                         </div>
-                        <h3 className="font-bold text-lg leading-tight">{listing.title}</h3>
-                        <p className="text-primary font-black">{listing.price}</p>
-                        <p className="text-foreground/40 text-xs">{listing.location}</p>
-                      </div>
-                      <div className="flex sm:flex-col items-center justify-center gap-6 px-4">
-                        <div className="text-center">
-                          <p className="text-[10px] font-black text-foreground/30 uppercase">Views</p>
-                          <p className="font-bold">{listing.views}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[10px] font-black text-foreground/30 uppercase">Leads</p>
-                          <p className="font-bold text-primary">{listing.leads}</p>
+                        <h3 className="font-bold text-base leading-tight text-foreground">{listing.title}</h3>
+                        <div className="flex items-center justify-center sm:justify-start gap-3 mt-1">
+                           <p className="text-primary font-bold text-sm">{listing.price}</p>
+                           <p className="text-secondary text-[10px] font-medium flex items-center gap-1">
+                              <MapPin className="w-3 h-3" /> {listing.location}
+                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button className="p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-primary/20 hover:text-primary transition-all">
-                          <Edit2 className="w-4 h-4" />
+                      <div className="flex sm:flex-row items-center justify-center gap-8 px-4 border-l border-border hidden md:flex">
+                        <div className="text-center">
+                          <p className="text-[9px] font-bold text-secondary uppercase tracking-wider">Views</p>
+                          <p className="text-sm font-bold text-foreground">{listing.views}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[9px] font-bold text-secondary uppercase tracking-wider">Leads</p>
+                          <p className="text-sm font-bold text-primary">{listing.leads}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button className="p-2 rounded-lg bg-background border border-border hover:border-primary hover:text-primary transition-all shadow-sm">
+                          <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button className="p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-red-500/20 hover:text-red-500 transition-all">
-                          <Trash2 className="w-4 h-4" />
+                        <button className="p-2 rounded-lg bg-background border border-border hover:border-red-500 hover:text-red-500 transition-all shadow-sm">
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -263,53 +263,53 @@ export default function SellerDashboard() {
             {activeTab === "leads" && (
               <motion.div
                 key="leads"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="p-8 space-y-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="p-6 md:p-8 space-y-6"
               >
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-black">Identified Buyer Matches</h2>
-                  <div className="flex items-center gap-2 text-xs font-bold text-primary px-3 py-1.5 rounded-lg bg-primary/10">
-                    <Clock className="w-3 h-3" /> Auto-refreshes every 15m
+                  <h2 className="text-xl font-bold text-foreground">Qualified Leads</h2>
+                  <div className="flex items-center gap-2 text-[10px] font-bold text-primary px-2 py-1 rounded bg-primary/5 border border-primary/10">
+                    <Clock className="w-3 h-3" /> Last Update: 2m ago
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {mockLeads.map((lead) => (
                     <div 
                       key={lead.id}
-                      className="p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-primary/30 transition-all space-y-4"
+                      className="p-5 rounded-xl border border-border hover:border-primary/30 transition-all space-y-4 bg-card shadow-sm"
                     >
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-black text-primary">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
                             {lead.buyerName[0]}
                           </div>
                           <div>
-                            <h3 className="font-bold text-lg">{lead.buyerName}</h3>
-                            <p className="text-xs text-foreground/40">{lead.date}</p>
+                            <h3 className="font-bold text-base text-foreground">{lead.buyerName}</h3>
+                            <p className="text-[10px] font-medium text-secondary">{lead.date}</p>
                           </div>
                         </div>
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 font-black text-sm">
-                          <CheckCircle2 className="w-4 h-4" /> {lead.match} Match Score
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-red-50 border border-red-100 text-primary font-bold text-xs">
+                          <CheckCircle2 className="w-3 h-3" /> {lead.match} Compatibility
                         </div>
                       </div>
                       
-                      <div className="grid sm:grid-cols-2 gap-4 pt-2">
-                        <div className="p-4 rounded-2xl bg-black/20 space-y-1">
-                          <p className="text-[10px] font-black text-foreground/30 uppercase">Searching For</p>
-                          <p className="font-bold">{lead.interest}</p>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div className="p-3 rounded-lg bg-muted/30 border border-border space-y-1">
+                          <p className="text-[9px] font-bold text-secondary uppercase tracking-wider">Interest</p>
+                          <p className="text-sm font-bold text-foreground">{lead.interest}</p>
                         </div>
-                        <div className="p-4 rounded-2xl bg-black/20 space-y-1">
-                          <p className="text-[10px] font-black text-foreground/30 uppercase">Target Location</p>
-                          <p className="font-bold">{lead.location}</p>
+                        <div className="p-3 rounded-lg bg-muted/30 border border-border space-y-1">
+                          <p className="text-[9px] font-bold text-secondary uppercase tracking-wider">Target Region</p>
+                          <p className="text-sm font-bold text-foreground">{lead.location}</p>
                         </div>
                       </div>
 
                       <div className="pt-2 flex justify-end">
-                        <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white font-bold transition-all border border-primary/20">
-                          View Search Profile <ExternalLink className="w-4 h-4" />
+                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 font-bold text-xs transition-all shadow-md">
+                          Review Profile <ExternalLink className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -321,22 +321,22 @@ export default function SellerDashboard() {
             {activeTab === "analytics" && (
               <motion.div
                 key="analytics"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="p-8 flex flex-col items-center justify-center min-h-[500px] text-center space-y-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="p-8 flex flex-col items-center justify-center min-h-[400px] text-center space-y-5"
               >
-                <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                   <TrendingUp className="w-10 h-10 text-amber-500" />
+                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center border border-red-100 text-primary">
+                   <TrendingUp className="w-8 h-8" />
                 </div>
                 <div>
-                   <h3 className="text-2xl font-black">Performance Insights</h3>
-                   <p className="text-foreground/60 max-w-sm mx-auto mt-2">
-                     Detailed analytics for your listings are being calculated. Connect more buyers to see trend data.
+                   <h3 className="text-xl font-bold text-foreground">Market Performance</h3>
+                   <p className="text-secondary text-sm max-w-sm mx-auto mt-1 leading-relaxed">
+                     Comprehensive analytics for your active inventory are being processed. Direct buyer engagement will appear here.
                    </p>
                 </div>
-                <button className="px-8 py-3 rounded-xl bg-foreground/5 border border-white/10 font-bold hover:bg-white/5 transition-all">
-                  Refresh Engine
+                <button className="px-6 py-2 rounded-lg bg-background border border-border font-bold text-sm hover:bg-muted/50 transition-all shadow-sm">
+                  Update Insights
                 </button>
               </motion.div>
             )}
@@ -344,7 +344,7 @@ export default function SellerDashboard() {
         </div>
       </div>
 
-      {/* Create Listing Modal */}
+      {/* Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
@@ -353,63 +353,63 @@ export default function SellerDashboard() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
-              className="absolute inset-0 bg-background/80 backdrop-blur-md"
+              className="absolute inset-0 bg-background/60 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-2xl glass rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden"
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative w-full max-w-xl bg-card rounded-xl border border-border shadow-2xl overflow-hidden"
             >
-              <div className="p-8 lg:p-12 space-y-8">
+              <div className="p-6 md:p-10 space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-3xl font-black">New Listing</h2>
-                    <p className="text-foreground/50 text-sm">Provide details about your interest for buyers.</p>
+                    <h2 className="text-2xl font-bold text-foreground">New Listing</h2>
+                    <p className="text-secondary text-sm">Fill in the details for your marketplace asset.</p>
                   </div>
                   <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
+                    className="p-2 rounded-lg bg-background border border-border hover:bg-muted/50 transition-all shadow-sm"
                   >
-                    <X className="w-6 h-6" />
+                    <X className="w-5 h-5 text-secondary" />
                   </button>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-foreground/40 flex items-center gap-2">
-                        <Tag className="w-3 h-3" /> Title
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-secondary uppercase tracking-wider">
+                        Asset Title
                       </label>
                       <input 
                         {...register("title")}
                         placeholder="e.g. 2024 Luxury Villa"
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        className="w-full bg-background border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
                       />
                       {errors.title && <p className="text-red-500 text-[10px] font-bold">{errors.title.message}</p>}
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-foreground/40 flex items-center gap-2">
-                        <DollarSign className="w-3 h-3" /> Price
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-secondary uppercase tracking-wider">
+                        Price
                       </label>
                       <input 
                         {...register("price")}
                         placeholder="e.g. $250,000"
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        className="w-full bg-background border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
                       />
                       {errors.price && <p className="text-red-500 text-[10px] font-bold">{errors.price.message}</p>}
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-foreground/40 flex items-center gap-2">
-                        <LayoutDashboard className="w-3 h-3" /> Category
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-secondary uppercase tracking-wider">
+                        Category
                       </label>
                       <select 
                         {...register("category")}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none"
+                        className="w-full bg-background border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm appearance-none cursor-pointer"
                       >
                         <option value="Houses">Houses</option>
                         <option value="Cars">Cars</option>
@@ -419,45 +419,45 @@ export default function SellerDashboard() {
                       {errors.category && <p className="text-red-500 text-[10px] font-bold">{errors.category.message}</p>}
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-foreground/40 flex items-center gap-2">
-                        <MapPin className="w-3 h-3" /> Location
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-secondary uppercase tracking-wider">
+                        Location
                       </label>
                       <input 
                         {...register("location")}
                         placeholder="e.g. Dubai, UAE"
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        className="w-full bg-background border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
                       />
                       {errors.location && <p className="text-red-500 text-[10px] font-bold">{errors.location.message}</p>}
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-foreground/40 flex items-center gap-2">
-                      <Edit2 className="w-3 h-3" /> Description
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-secondary uppercase tracking-wider">
+                      Detailed Description
                     </label>
                     <textarea 
                       {...register("description")}
                       rows={4}
-                      placeholder="Describe the item in detail..."
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
+                      placeholder="Enter a comprehensive description..."
+                      className="w-full bg-background border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm resize-none"
                     />
                     {errors.description && <p className="text-red-500 text-[10px] font-bold">{errors.description.message}</p>}
                   </div>
 
-                  <div className="pt-4 flex gap-4">
+                  <div className="pt-4 flex gap-3">
                     <button 
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="flex-1 py-5 rounded-2xl glass border border-white/10 font-bold hover:bg-white/5 transition-all"
+                      className="flex-1 py-3 rounded-lg border border-border font-bold text-sm hover:bg-muted/50 transition-all shadow-sm"
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      className="flex-1 py-5 rounded-2xl bg-primary text-white font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+                      className="flex-1 py-3 rounded-lg bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2"
                     >
-                      Publish Listing <Sparkles className="w-5 h-5" />
+                      Publish Listing <CheckCircle2 className="w-4 h-4" />
                     </button>
                   </div>
                 </form>

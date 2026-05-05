@@ -1,4 +1,5 @@
 import ExploreDashboard from "@/components/page-sections/explore/ExploreDashboard";
+import Container from "@/components/globals/Container";
 
 export default async function ExploreInterestsPage({
   params,
@@ -9,8 +10,8 @@ export default async function ExploreInterestsPage({
   const decodedEmail = decodeURIComponent(email);
 
   return (
-    <div className=" container mx-auto w-full px-4 py-10 flex-grow flex flex-col">
+    <Container className="py-10 flex-grow flex flex-col">
       <ExploreDashboard email={decodedEmail} />
-    </div>
+    </Container>
   );
 }

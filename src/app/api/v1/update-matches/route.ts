@@ -31,7 +31,12 @@ export async function POST(request: Request) {
     const batch = adminDb.batch();
 
     matches.forEach((match: any) => {
-      const resultId = Buffer.from(match.sourceUrl).toString('base64').replace(/[/+=]/g, '_');
+      // Create a unique ID per user and per source URL to ensure "add if new, update if exists"
+      const uniqueKey = `${userEmail}_${match.sourceUrl}`;
+      const resultId = Buffer.from(uniqueKey)
+        .toString("base64")
+        .replace(/[/+=]/g, "_");
+      
       const resultRef = resultsCollection.doc(resultId);
 
       batch.set(resultRef, {
@@ -41,6 +46,8 @@ export async function POST(request: Request) {
         updatedAt: FieldValue.serverTimestamp(),
         isNew: true,
       }, { merge: true });
+
+      console.log("Saving to db for user : ", userEmail, resultRef.id);
     });
 
     await batch.commit();
@@ -49,13 +56,15 @@ export async function POST(request: Request) {
     // We could find the user in 'FreeSubscribers', 'PrioritySubscribers', etc.
     // and update their lastRun field here.
 
-    return NextResponse.json({ 
-      success: true, 
-      message: `Successfully processed ${matches.length} matches for ${userEmail}` 
+    return NextResponse.json({
+      success: true,
+      message: `Successfully processed ${matches.length} matches for ${userEmail}`,
     });
-
   } catch (error: any) {
     console.error("API Error:", error);
-    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error.message },
+      { status: 500 },
+    );
   }
 }

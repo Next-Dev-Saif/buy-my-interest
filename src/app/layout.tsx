@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Fraunces, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/globals/Navbar";
 import Footer from "@/components/globals/Footer";
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${fraunces.variable} ${poppins.variable} antialiased`} suppressHydrationWarning>
       <body className="font-poppins min-h-screen flex flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <Navbar />

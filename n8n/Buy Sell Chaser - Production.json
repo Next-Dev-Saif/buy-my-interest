@@ -63,6 +63,15 @@
     {
       "parameters": {
         "url": "https://buy-my-interest.vercel.app/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "PremiumSubscribers"
+            }
+          ]
+        },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -118,6 +127,15 @@
     {
       "parameters": {
         "url": "https://buy-my-interest.vercel.app/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "FreeSubscribers"
+            }
+          ]
+        },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -262,7 +280,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const userContext = $(\"Extract-Interested-Items\").first().json.user;\n\nconst groups = {};\n\nfor (const item of $input.all()) {\n  const json = item.json || {};\n  const email = userContext.email;\n\n  if (!groups[email]) {\n    groups[email] = {\n      userEmail: email,\n      results: []\n    };\n  }\n\n  const organic = item.json.organic_results || [];\n  groups[email].results.push(...organic.map(r => ({ ...r, category: item.json.product })));\n}\n\nreturn Object.values(groups).map(g => ({ json: g }));"
+        "jsCode": "const userContext = $(\"Extract-Interested-Items\").first().json.user;\nconst currentEmail = userContext.email;\n\nconst groups = {};\n\n// Get all input queries to map them back later\nconst allQueries = $(\"Extract-Interested-Items\").all();\n\nfor (const item of $(\"Search-Google\").all()) {\n  // Access the paired item index to find which query produced this result\n  const inputIndex = item.pairedItem?.item;\n  \n  if (inputIndex !== undefined && allQueries[inputIndex]) {\n    const inputData = allQueries[inputIndex].json;\n    const itemUserEmail = inputData.user?.email;\n\n    if (itemUserEmail === currentEmail) {\n      if (!groups[currentEmail]) {\n        groups[currentEmail] = {\n          userEmail: currentEmail,\n          results: []\n        };\n      }\n\n      const organic = item.json.organic_results || [];\n      groups[currentEmail].results.push(...organic.map(r => ({ \n        ...r, \n        category: inputData.product \n      })));\n    }\n  }\n}\n\nreturn Object.values(groups).map(g => ({ json: g }));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -420,6 +438,75 @@
       ],
       "id": "9ddf22aa-7a4e-4f24-b612-ecd6365206b4",
       "name": "JSON VERIFIER"
+    },
+    {
+      "parameters": {
+        "url": "https://buy-my-interest.vercel.app/api/v1/check-match",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userEmail",
+              "value": "={{ $json.userEmail }}"
+            },
+            {
+              "name": "sourceUrl",
+              "value": "={{ $json.link }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3648,
+        -704
+      ],
+      "id": "7a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Check-Match"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8f2a3b4c-5d6e-7f8g-9h0i-1j2k3l4m5n6o",
+              "leftValue": "={{ $json.exists }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3872,
+        -704
+      ],
+      "id": "5d6e7f8g-9h0i-1j2k-3l4m-5n6o7p8q9r0s",
+      "name": "Match-Exists?"
     }
   ],
   "pinData": {
@@ -940,7 +1027,7 @@
       "main": [
         [
           {
-            "node": "Loop Over Users",
+            "node": "Aggregate-Search-Results",
             "type": "main",
             "index": 0
           }
@@ -1000,10 +1087,16 @@
     },
     "Loop Over Links": {
       "main": [
-        [],
         [
           {
-            "node": "Scrape-Page",
+            "node": "Loop Over Users",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check-Match",
             "type": "main",
             "index": 0
           }
@@ -1059,6 +1152,46 @@
         [
           {
             "node": "Push-To-Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push-To-Website": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check-Match": {
+      "main": [
+        [
+          {
+            "node": "Match-Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match-Exists?": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Links",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scrape-Page",
             "type": "main",
             "index": 0
           }
