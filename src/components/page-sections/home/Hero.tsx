@@ -61,12 +61,12 @@ export default function Hero() {
             >
               <Link
                 href="/get-started"
-                className="group px-9 py-5 rounded-2xl bg-primary text-primary-foreground font-bold text-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-primary/20"
+                className="group w-full sm:w-auto px-9 py-5 rounded-2xl bg-primary text-primary-foreground font-bold text-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-primary/20"
               >
                 Start Free Search{" "}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="px-9 py-5 rounded-2xl border border-border/80 bg-background/50 text-foreground font-bold text-lg hover:bg-muted/40 transition-all flex items-center justify-center gap-3 backdrop-blur">
+              <button className="w-full sm:w-auto px-9 py-5 rounded-2xl border border-border/80 bg-background/50 text-foreground font-bold text-lg hover:bg-muted/40 transition-all flex items-center justify-center gap-3 backdrop-blur">
                 <PlayCircle className="w-5 h-5 text-primary" /> Watch Demo
               </button>
             </motion.div>
@@ -75,16 +75,16 @@ export default function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.46 }}
-              className="grid grid-cols-3 gap-3 pt-8"
+              className="grid grid-cols-3 gap-3 pt-4 sm:pt-8"
             >
               {[
                 { value: "500+", label: "Sources" },
-                { value: "12k+", label: "Searchers" },
-                { value: "2hr", label: "Scan Cycle" },
+                { value: "12k+", label: "Users" },
+                { value: "2hr", label: "Cycle" },
               ].map((s) => (
-                <div key={s.label} className="glass rounded-2xl border border-border/70 px-4 py-4 text-left">
-                  <p className="text-2xl font-black text-foreground">{s.value}</p>
-                  <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.22em] mt-1">
+                <div key={s.label} className="glass rounded-[1.5rem] border border-border/70 px-4 py-5 text-center sm:text-left">
+                  <p className="text-xl sm:text-2xl font-black text-foreground">{s.value}</p>
+                  <p className="text-[9px] font-bold text-secondary uppercase tracking-[0.15em] mt-1 truncate">
                     {s.label}
                   </p>
                 </div>
@@ -100,8 +100,8 @@ export default function Hero() {
           >
               <div className="relative z-10 rounded-[2.5rem] overflow-hidden border border-border/70 shadow-2xl">
                   <Image 
-                    src="https://images.unsplash.com/photo-1592193333411-29788ef33993?q=80&w=1600&auto=format&fit=crop" 
-                    alt="Premium Automotive Discovery" 
+                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop" 
+                    alt="Market Intelligence Dashboard" 
                     width={1000} 
                     height={1000}
                     className="w-full h-auto object-cover"

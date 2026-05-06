@@ -68,13 +68,13 @@ export default function InterestCard({ data }: InterestCardProps) {
           <>
             <button
               onClick={prevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/90 text-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm text-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-border/50"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/90 text-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm text-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-border/50"
             >
               <ChevronRight size={16} />
             </button>
@@ -83,11 +83,11 @@ export default function InterestCard({ data }: InterestCardProps) {
 
         {/* Status Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
-          <div className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-white/90 text-foreground shadow-sm border border-border">
+          <div className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-background/80 backdrop-blur-sm text-foreground shadow-sm border border-border/50">
             {data.category}
           </div>
           {data.isNew && (
-            <div className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-primary text-white shadow-sm flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow-sm flex items-center gap-1.5">
               <Sparkles size={10} />
               New
             </div>
@@ -134,7 +134,7 @@ export default function InterestCard({ data }: InterestCardProps) {
             href={data.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-all active:scale-95 shadow-sm"
+            className="inline-flex items-center justify-center bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-all active:scale-95 shadow-sm"
           >
             View Details
           </a>

@@ -42,7 +42,7 @@ export default function Process() {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-16 relative">
+        <div className="grid md:grid-cols-3 gap-12 sm:gap-16 relative">
           <div className="hidden md:block absolute top-24 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
           
           {steps.map((item, i) => (
@@ -52,25 +52,29 @@ export default function Process() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="relative group"
+              className="relative group flex flex-col items-center md:items-start text-center md:text-left"
             >
-              <div className="mb-10 text-8xl font-black text-foreground/[0.04] absolute -top-12 -left-4 group-hover:text-primary/[0.08] transition-colors select-none">
+              <div className="mb-10 text-7xl sm:text-8xl font-black text-foreground/[0.04] absolute -top-10 sm:-top-12 md:-left-4 group-hover:text-primary/[0.08] transition-colors select-none">
                 {item.step}
               </div>
               
-              <div className="w-20 h-20 flex items-center justify-center relative z-10 mb-8 rounded-3xl glass border border-border/70">
-                <item.icon className="w-10 h-10 text-primary" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center relative z-10 mb-6 sm:mb-8 rounded-2xl sm:rounded-3xl glass border border-border/70 shadow-sm group-hover:border-primary/30 transition-colors">
+                <item.icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
               </div>
               
-              <h3 className="text-2xl font-black mb-4 text-foreground flex items-center gap-2 font-editorial tracking-tight">
+              <h3 className="text-xl sm:text-2xl font-black mb-3 sm:mb-4 text-foreground flex items-center gap-2 font-editorial tracking-tight">
                 {item.title}
               </h3>
-              <p className="text-secondary leading-relaxed font-semibold">{item.desc}</p>
+              <p className="text-secondary leading-relaxed font-semibold text-sm sm:text-base max-w-[280px] sm:max-w-none">{item.desc}</p>
               
               {i < steps.length - 1 && (
                 <div className="hidden md:block absolute -right-8 top-24 text-border group-hover:text-primary transition-colors">
                    <ArrowRight className="w-6 h-6" />
                 </div>
+              )}
+
+              {i < steps.length - 1 && (
+                <div className="md:hidden w-px h-12 bg-gradient-to-b from-border/60 to-transparent my-4" />
               )}
             </motion.div>
           ))}
