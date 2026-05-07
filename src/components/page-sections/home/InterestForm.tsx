@@ -7,29 +7,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useRouter } from "next/navigation";
-import { 
-  Loader2, 
-  CheckCircle2, 
-  X, 
-  Sparkles, 
-  MapPin, 
-  Search, 
-  ArrowRight, 
-  ArrowLeft, 
-  User, 
-  Mail, 
-  Target, 
-  ShoppingCart, 
-  Tag, 
-  PawPrint, 
-  Car, 
-  Home, 
+import {
+  Loader2,
+  CheckCircle2,
+  X,
+  Sparkles,
+  MapPin,
+  Search,
+  ArrowRight,
+  ArrowLeft,
+  User,
+  Mail,
+  Target,
+  ShoppingCart,
+  Tag,
+  PawPrint,
+  Car,
+  Home,
   Map,
-  Plus
+  Plus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 
 const interestedItemsOptions = ["Pets", "Cars", "Houses", "Plots"] as const;
 
@@ -46,6 +46,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function InterestForm() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -74,24 +75,28 @@ export default function InterestForm() {
   const selectedLocations = watch("interestedLocations") || [];
 
   useEffect(() => {
+    if (user) {
+      setValue("fullName", user.displayName || "");
+      setValue("email", user.email || "");
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const role = urlParams.get("role");
     if (role === "buyer" || role === "seller") {
       setValue("userType", role as "buyer" | "seller");
       setStep(1);
     }
-  }, [setValue]);
+  }, [setValue, user]);
 
   const handleNext = async () => {
     if (step === 0) {
       setStep(1);
       return;
     }
-    
+
     let fields: (keyof FormValues)[] = [];
-    if (step === 1) fields = ["fullName", "email"];
-    if (step === 2) fields = ["interestedItems"];
-    if (step === 3) fields = ["interestedLocations"];
+    if (step === 1) fields = ["interestedItems"];
+    if (step === 2) fields = ["interestedLocations"];
 
     const isValid = await trigger(fields);
     if (isValid) setStep((s) => s + 1);
@@ -102,32 +107,46 @@ export default function InterestForm() {
   const addLocation = () => {
     const val = locationInput.trim();
     if (val && !selectedLocations.includes(val)) {
-      setValue("interestedLocations", [...selectedLocations, val], { shouldValidate: true });
+      setValue("interestedLocations", [...selectedLocations, val], {
+        shouldValidate: true,
+      });
     }
     setLocationInput("");
   };
-  
+
   const removeLocation = (loc: string) => {
-    setValue("interestedLocations", selectedLocations.filter((l) => l !== loc), { shouldValidate: true });
+    setValue(
+      "interestedLocations",
+      selectedLocations.filter((l) => l !== loc),
+      { shouldValidate: true },
+    );
   };
 
   const toggleItem = (item: string) => {
     if (selectedItems.includes(item)) {
-      setValue("interestedItems", selectedItems.filter((i) => i !== item), { shouldValidate: true });
+      setValue(
+        "interestedItems",
+        selectedItems.filter((i) => i !== item),
+        { shouldValidate: true },
+      );
     } else {
-      setValue("interestedItems", [...selectedItems, item], { shouldValidate: true });
+      setValue("interestedItems", [...selectedItems, item], {
+        shouldValidate: true,
+      });
     }
   };
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
-    
+
     const urlParams = new URLSearchParams(window.location.search);
     const plan = urlParams.get("plan") || "free";
-    
+
     let collectionName = "FreeSubscribers";
-    if (plan === "pro" || plan === "vanguard") collectionName = "PrioritySubscribers";
-    if (plan === "elite" || plan === "apex") collectionName = "PremiumSubscribers";
+    if (plan === "pro" || plan === "vanguard")
+      collectionName = "PrioritySubscribers";
+    if (plan === "elite" || plan === "apex")
+      collectionName = "PremiumSubscribers";
 
     try {
       await addDoc(collection(db, collectionName), {
@@ -158,7 +177,7 @@ export default function InterestForm() {
         className="glass p-12 lg:p-20 rounded-[3rem] flex flex-col items-center justify-center text-center space-y-8 min-h-[500px] shadow-2xl relative overflow-hidden"
       >
         <div className="absolute top-0 left-0 w-full h-full bg-primary/5 animate-pulse pointer-events-none" />
-        <motion.div 
+        <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", damping: 12, stiffness: 200 }}
@@ -167,20 +186,22 @@ export default function InterestForm() {
           <CheckCircle2 className="w-12 h-12 text-primary-foreground" />
         </motion.div>
         <div className="space-y-3">
-          <h3 className="text-3xl lg:text-4xl font-black font-editorial text-foreground">Initialization Complete</h3>
+          <h3 className="text-3xl lg:text-4xl font-black font-editorial text-foreground">
+            Initialization Complete
+          </h3>
           <p className="text-secondary text-lg max-w-md mx-auto leading-relaxed font-medium">
-            {userType === "buyer" 
+            {userType === "buyer"
               ? "Your intelligence agents are being deployed across our global network. Preparing your command center..."
               : "Your seller profile is being integrated into our marketplace. Stand by for redirection."}
           </p>
         </div>
         <div className="w-48 h-1.5 bg-muted rounded-full overflow-hidden">
-           <motion.div 
+          <motion.div
             initial={{ x: "-100%" }}
             animate={{ x: "0%" }}
             transition={{ duration: 2, ease: "easeInOut" }}
-            className="h-full bg-primary" 
-           />
+            className="h-full bg-primary"
+          />
         </div>
       </motion.div>
     );
@@ -195,75 +216,75 @@ export default function InterestForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <button
             type="button"
-            onClick={() => { setValue("userType", "buyer"); handleNext(); }}
+            onClick={() => {
+              setValue("userType", "buyer");
+              handleNext();
+            }}
             className={`group p-8 rounded-[2rem] text-left transition-all duration-500 border-2 flex flex-col gap-6 ${
-              userType === "buyer" 
-                ? "bg-primary border-primary shadow-2xl shadow-primary/20" 
+              userType === "buyer"
+                ? "bg-primary border-primary shadow-2xl shadow-primary/20"
                 : "bg-card/50 border-border/60 hover:border-primary/40 backdrop-blur-sm"
             }`}
           >
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-500 ${userType === "buyer" ? "bg-primary-foreground/20" : "bg-primary/5 group-hover:bg-primary/10"}`}>
-              <ShoppingCart className={`w-7 h-7 ${userType === "buyer" ? "text-primary-foreground" : "text-primary"}`} />
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-500 ${userType === "buyer" ? "bg-primary-foreground/20" : "bg-primary/5 group-hover:bg-primary/10"}`}
+            >
+              <ShoppingCart
+                className={`w-7 h-7 ${userType === "buyer" ? "text-primary-foreground" : "text-primary"}`}
+              />
             </div>
             <div>
-              <h3 className={`text-xl font-black mb-2 font-editorial ${userType === "buyer" ? "text-primary-foreground" : "text-foreground"}`}>I'm a Buyer</h3>
-              <p className={`text-sm leading-relaxed font-medium ${userType === "buyer" ? "text-primary-foreground/80" : "text-secondary"}`}>I want to find specific items and receive real-time match alerts.</p>
+              <h3
+                className={`text-xl font-black mb-2 font-editorial ${userType === "buyer" ? "text-primary-foreground" : "text-foreground"}`}
+              >
+                I'm a Buyer
+              </h3>
+              <p
+                className={`text-sm leading-relaxed font-medium ${userType === "buyer" ? "text-primary-foreground/80" : "text-secondary"}`}
+              >
+                I want to find specific items and receive real-time match
+                alerts.
+              </p>
             </div>
           </button>
 
           <button
             type="button"
-            onClick={() => { setValue("userType", "seller"); handleNext(); }}
+            onClick={() => {
+              setValue("userType", "seller");
+              handleNext();
+            }}
             className={`group p-8 rounded-[2rem] text-left transition-all duration-500 border-2 flex flex-col gap-6 ${
-              userType === "seller" 
-                ? "bg-primary border-primary shadow-2xl shadow-primary/20" 
+              userType === "seller"
+                ? "bg-primary border-primary shadow-2xl shadow-primary/20"
                 : "bg-card/50 border-border/60 hover:border-primary/40 backdrop-blur-sm"
             }`}
           >
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-500 ${userType === "seller" ? "bg-primary-foreground/20" : "bg-primary/5 group-hover:bg-primary/10"}`}>
-              <Tag className={`w-7 h-7 ${userType === "seller" ? "text-primary-foreground" : "text-primary"}`} />
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-500 ${userType === "seller" ? "bg-primary-foreground/20" : "bg-primary/5 group-hover:bg-primary/10"}`}
+            >
+              <Tag
+                className={`w-7 h-7 ${userType === "seller" ? "text-primary-foreground" : "text-primary"}`}
+              />
             </div>
             <div>
-              <h3 className={`text-xl font-black mb-2 font-editorial ${userType === "seller" ? "text-primary-foreground" : "text-foreground"}`}>I'm a Seller</h3>
-              <p className={`text-sm leading-relaxed font-medium ${userType === "seller" ? "text-primary-foreground/80" : "text-secondary"}`}>I want to list items and connect with targeted prospects.</p>
+              <h3
+                className={`text-xl font-black mb-2 font-editorial ${userType === "seller" ? "text-primary-foreground" : "text-foreground"}`}
+              >
+                I'm a Seller
+              </h3>
+              <p
+                className={`text-sm leading-relaxed font-medium ${userType === "seller" ? "text-primary-foreground/80" : "text-secondary"}`}
+              >
+                I want to list items and connect with targeted prospects.
+              </p>
             </div>
           </button>
         </div>
-      )
+      ),
     },
     {
       id: 1,
-      title: "Your Identity",
-      desc: "We need your contact details to manage your profile and send you notifications when matches are found.",
-      content: (
-        <div className="space-y-6">
-          <div className="space-y-2.5">
-            <label className="text-[10px] font-black text-secondary/60 uppercase tracking-[0.2em] flex items-center gap-2">
-              <User className="w-3.5 h-3.5" /> Full Name
-            </label>
-            <input
-              {...register("fullName")}
-              className="w-full bg-background/50 border border-border/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-base font-semibold backdrop-blur-sm placeholder:text-secondary/20"
-              placeholder="e.g. John Doe"
-            />
-            {errors.fullName && <p className="text-red-500 text-[10px] font-black uppercase tracking-wider">{errors.fullName.message}</p>}
-          </div>
-          <div className="space-y-2.5">
-            <label className="text-[10px] font-black text-secondary/60 uppercase tracking-[0.2em] flex items-center gap-2">
-              <Mail className="w-3.5 h-3.5" /> Email Address
-            </label>
-            <input
-              {...register("email")}
-              className="w-full bg-background/50 border border-border/60 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-base font-semibold backdrop-blur-sm placeholder:text-secondary/20"
-              placeholder="name@example.com"
-            />
-            {errors.email && <p className="text-red-500 text-[10px] font-black uppercase tracking-wider">{errors.email.message}</p>}
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 2,
       title: "Market Categories",
       desc: "Select the specific categories you're interested in. This narrows down our scan to only show you relevant listings.",
       content: (
@@ -289,20 +310,32 @@ export default function InterestForm() {
                       : "bg-background/40 border-border/60 hover:border-primary/40 text-foreground backdrop-blur-sm"
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isSelected ? "bg-primary-foreground/20" : "bg-primary/5"}`}>
-                    <Icon className={`w-5 h-5 ${isSelected ? "text-primary-foreground" : "text-primary"}`} />
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isSelected ? "bg-primary-foreground/20" : "bg-primary/5"}`}
+                  >
+                    <Icon
+                      className={`w-5 h-5 ${isSelected ? "text-primary-foreground" : "text-primary"}`}
+                    />
                   </div>
-                  <span className={`text-base font-bold ${isSelected ? "text-primary-foreground" : "text-foreground"}`}>{item}</span>
+                  <span
+                    className={`text-base font-bold ${isSelected ? "text-primary-foreground" : "text-foreground"}`}
+                  >
+                    {item}
+                  </span>
                 </button>
               );
             })}
           </div>
-          {errors.interestedItems && <p className="text-red-500 text-[10px] font-black uppercase tracking-wider">{errors.interestedItems.message}</p>}
+          {errors.interestedItems && (
+            <p className="text-red-500 text-[10px] font-black uppercase tracking-wider">
+              {errors.interestedItems.message}
+            </p>
+          )}
         </div>
-      )
+      ),
     },
     {
-      id: 3,
+      id: 2,
       title: "Target Locations",
       desc: "Specify where you are looking. This ensures we only notify you about opportunities in your preferred geographic areas.",
       content: (
@@ -318,14 +351,20 @@ export default function InterestForm() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary border border-primary/20 text-xs font-black uppercase tracking-wider shadow-sm"
                 >
                   {loc}
-                  <button type="button" onClick={() => removeLocation(loc)} className="hover:text-foreground transition-colors p-0.5 rounded-md hover:bg-primary/10">
+                  <button
+                    type="button"
+                    onClick={() => removeLocation(loc)}
+                    className="hover:text-foreground transition-colors p-0.5 rounded-md hover:bg-primary/10"
+                  >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </motion.span>
               ))}
             </AnimatePresence>
             {selectedLocations.length === 0 && (
-              <span className="text-xs font-bold text-secondary/30 italic flex items-center">No locations added yet.</span>
+              <span className="text-xs font-bold text-secondary/30 italic flex items-center">
+                No locations added yet.
+              </span>
             )}
           </div>
           <div className="flex gap-3">
@@ -334,7 +373,9 @@ export default function InterestForm() {
               <input
                 value={locationInput}
                 onChange={(e) => setLocationInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addLocation())}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && (e.preventDefault(), addLocation())
+                }
                 className="w-full bg-background/50 border border-border/60 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-base font-semibold backdrop-blur-sm placeholder:text-secondary/20"
                 placeholder="e.g. California, USA"
               />
@@ -347,25 +388,29 @@ export default function InterestForm() {
               <Plus className="w-4 h-4" /> Add
             </button>
           </div>
-          {errors.interestedLocations && <p className="text-red-500 text-[10px] font-black uppercase tracking-wider">{errors.interestedLocations.message}</p>}
+          {errors.interestedLocations && (
+            <p className="text-red-500 text-[10px] font-black uppercase tracking-wider">
+              {errors.interestedLocations.message}
+            </p>
+          )}
         </div>
-      )
-    }
+      ),
+    },
   ];
 
-  const currentStepData = steps.find(s => s.id === step) || steps[0];
+  const currentStepData = steps.find((s) => s.id === step) || steps[0];
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-0">
       {/* Progress Indicator */}
       <div className="w-full mb-10">
         <div className="flex items-center justify-between mb-3">
-           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
-             Step {step + 1} of {steps.length}
-           </span>
-           <span className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
-             {Math.round(((step + 1) / steps.length) * 100)}%
-           </span>
+          <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+            Step {step + 1} of {steps.length}
+          </span>
+          <span className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
+            {Math.round(((step + 1) / steps.length) * 100)}%
+          </span>
         </div>
         <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
           <motion.div
@@ -378,55 +423,65 @@ export default function InterestForm() {
       </div>
 
       <div className="glass rounded-[2.5rem] border border-border shadow-2xl overflow-hidden min-h-[500px] flex flex-col transition-all duration-500">
-          <div className="p-8 md:p-12 lg:p-16 flex flex-col flex-1">
-            <div className="mb-10">
-               <h2 className="text-3xl lg:text-4xl font-black text-foreground mb-3 font-editorial tracking-tight">{currentStepData.title}</h2>
-               <p className="text-base text-secondary leading-relaxed font-medium">{currentStepData.desc}</p>
-            </div>
+        <div className="p-8 md:p-12 lg:p-16 flex flex-col flex-1">
+          <div className="mb-10">
+            <h2 className="text-3xl lg:text-4xl font-black text-foreground mb-3 font-editorial tracking-tight">
+              {currentStepData.title}
+            </h2>
+            <p className="text-base text-secondary leading-relaxed font-medium">
+              {currentStepData.desc}
+            </p>
+          </div>
 
-            <div className="flex-1 flex flex-col justify-between">
-               <AnimatePresence mode="wait">
-                  <motion.div
-                    key={step}
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex-1"
-                  >
-                    {currentStepData.content}
-                  </motion.div>
-               </AnimatePresence>
+          <div className="flex-1 flex flex-col justify-between">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1"
+              >
+                {currentStepData.content}
+              </motion.div>
+            </AnimatePresence>
 
-               <div className="flex items-center gap-4 mt-10 pt-8 border-t border-border/40">
-                  {step > 0 && (
-                    <button
-                      onClick={handleBack}
-                      className="w-14 h-14 flex items-center justify-center rounded-2xl border border-border hover:bg-muted/50 text-secondary transition-all active:scale-90"
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                    </button>
-                  )}
-                  
-                  {step < steps.length - 1 ? (
-                    <button
-                      onClick={handleNext}
-                      className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-[0.2em] hover:bg-primary/90 transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/10 active:scale-[0.98]"
-                    >
-                      Continue <ArrowRight className="w-4 h-4" />
-                    </button>
+            <div className="flex items-center gap-4 mt-10 pt-8 border-t border-border/40">
+              {step > 0 && (
+                <button
+                  onClick={handleBack}
+                  className="w-14 h-14 flex items-center justify-center rounded-2xl border border-border hover:bg-muted/50 text-secondary transition-all active:scale-90"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              )}
+
+              {step < steps.length - 1 ? (
+                <button
+                  onClick={handleNext}
+                  className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-[0.2em] hover:bg-primary/90 transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/10 active:scale-[0.98]"
+                >
+                  Continue <ArrowRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit(onSubmit)}
+                  disabled={isSubmitting}
+                  className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-[0.2em] hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-primary/10 active:scale-[0.98]"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    <button
-                      onClick={handleSubmit(onSubmit)}
-                      disabled={isSubmitting}
-                      className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-[0.2em] hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-primary/10 active:scale-[0.98]"
-                    >
-                      {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Complete Setup <Sparkles className="w-4 h-4" /></>}
-                    </button>
+                    <>
+                      Complete Setup <Sparkles className="w-4 h-4" />
+                    </>
                   )}
-               </div>
+                </button>
+              )}
             </div>
           </div>
+        </div>
       </div>
     </div>
   );

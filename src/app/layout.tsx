@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/globals/Navbar";
-import Footer from "@/components/globals/Footer";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -23,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/globals/ThemeProvider";
+import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({
   children,
@@ -33,9 +32,9 @@ export default function RootLayout({
     <html lang="en" className={`${fraunces.variable} ${poppins.variable} antialiased`} suppressHydrationWarning>
       <body className="font-poppins min-h-screen flex flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <Navbar />
-          <main className="flex-grow flex flex-col">{children}</main>
-          <Footer />
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

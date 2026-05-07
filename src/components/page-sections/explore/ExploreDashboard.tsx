@@ -20,6 +20,7 @@ import {
   Image,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomSelect from "@/components/core-components/CustomSelect";
 
 interface ExploreDashboardProps {
   email: string;
@@ -344,6 +345,8 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         </div>
       </div>
 
+      <div className="h-px bg-border/40" />
+
       {/* Price Range */}
       <div className="space-y-5">
         <label className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/50 flex items-center gap-2">
@@ -377,6 +380,8 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         </div>
       </div>
 
+      <div className="h-px bg-border/40" />
+
       {/* Location */}
       <div className="space-y-5">
         <label className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/50 flex items-center gap-2">
@@ -394,24 +399,24 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         </div>
       </div>
 
+      <div className="h-px bg-border/40" />
+
       {/* Sort */}
       <div className="space-y-5">
-        <label className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/50 flex items-center gap-2">
-          Order By
-        </label>
-        <div className="relative group/sort">
-          <ArrowUpDown className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/30 group-focus-within/sort:text-primary transition-colors" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="w-full bg-background/30 border border-border/60 rounded-xl pl-11 pr-4 py-3.5 text-[11px] font-bold focus:ring-2 focus:ring-primary/10 outline-none cursor-pointer appearance-none text-foreground"
-          >
-            <option value="newest">Recently Posted</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-          </select>
-        </div>
+        <CustomSelect
+          label="Order By"
+          value={sortBy}
+          onChange={(val) => setSortBy(val as any)}
+          icon={ArrowUpDown}
+          options={[
+            { value: "newest", label: "Recently Posted" },
+            { value: "price-asc", label: "Price: Low to High" },
+            { value: "price-desc", label: "Price: High to Low" },
+          ]}
+        />
       </div>
+
+      <div className="h-px bg-border/40" />
 
       {/* Preferences */}
       <div className="space-y-5">
@@ -478,7 +483,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
   );
 
   return (
-    <div className="flex flex-col gap-14">
+    <div className="flex flex-col gap-12">
       {/* Mobile-Only App Header */}
       <div className="lg:hidden space-y-4">
         <h1 className="text-3xl font-black tracking-tight text-foreground font-editorial">
@@ -489,39 +494,89 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         </p>
       </div>
 
-      {/* Page Header - Desktop Only */}
-      <div className="hidden lg:flex flex-row gap-8 items-end justify-between border-b border-border/60 pb-10">
-        <div className="space-y-4">
-          <h1 className="text-6xl font-black tracking-tight text-foreground font-editorial">
-            Explore Results.
-          </h1>
-          <p className="text-base text-secondary font-medium max-w-xl leading-relaxed">
-            Marketplace opportunities identified for{" "}
-            <span className="text-foreground font-bold">{email}</span>. Use the
-            criteria below to refine your view.
-          </p>
+      <div className="">
+        {/* Page Header - Desktop Only */}
+        <div className="hidden lg:flex flex-row gap-8 items-end justify-between border-b border-border/60 pb-3">
+          <div className="space-y-4">
+            <h1 className="text-6xl font-black tracking-tight text-foreground font-editorial">
+              Explore Results.
+            </h1>
+            <p className="text-base text-secondary font-medium max-w-xl leading-relaxed">
+              Marketplace opportunities identified for{" "}
+              <span className="text-foreground font-bold">{email}</span>. Use
+              the criteria below to refine your view.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col items-end gap-1.5">
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/40">
+                Total Found
+              </span>
+              <span className="text-lg font-black text-foreground">
+                {processedResults.length.toLocaleString()}
+              </span>
+            </div>
+            <div className="h-10 w-px bg-border/60" />
+          </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col items-end gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/40">
-              Total Found
-            </span>
-            <span className="text-lg font-black text-foreground">
-              {processedResults.length.toLocaleString()}
-            </span>
+        {/* Search & Tools - Top Level */}
+        <div className="sticky top-20 lg:relative z-40 -mx-5 sm:mx-0 px-5 sm:px-0 py-4 lg:py-0 bg-background lg:bg-transparent border-b lg:border-none border-border/40 lg:shadow-none transition-all lg:mb-10">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center mb-5  gap-3">
+              <div className="relative flex-grow group/search">
+                <div className="absolute inset-0 bg-primary/5 rounded-2xl lg:rounded-[2.5rem] blur-2xl opacity-0 group-focus-within/search:opacity-100 transition-opacity" />
+                <div className="relative glass p-1.5 lg:p-1 rounded-2xl lg:rounded-[2.5rem] border border-border/60 shadow-lg shadow-black/[0.01]">
+                  <div className="relative flex items-center">
+                    <Search className="absolute left-5 lg:left-7 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-secondary/30 group-focus-within/search:text-primary transition-colors" />
+                    <input
+                      type="text"
+                      placeholder="Search model, keyword..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full bg-transparent border-none rounded-xl lg:rounded-[2rem] pl-12 lg:pl-16 pr-5 lg:pr-8 py-3 lg:py-3.5 text-sm lg:text-base font-semibold focus:outline-none focus:ring-0 transition-all placeholder:text-secondary/20"
+                    />
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowFilters(true)}
+                className="lg:hidden flex items-center justify-center w-12 h-12 rounded-2xl bg-foreground text-background transition-all hover:opacity-90 active:scale-90 shadow-lg shadow-foreground/10 flex-shrink-0"
+              >
+                <SlidersHorizontal className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Mobile Quick Categories */}
+            <div className="lg:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.05em] transition-all border ${
+                    selectedCategory === cat
+                      ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/10"
+                      : "bg-muted/40 border-border/40 text-secondary"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="h-10 w-px bg-border/60" />
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-16">
+      <div className="flex flex-col lg:flex-row gap-12">
         {/* Sidebar - Desktop */}
-        <aside className="hidden lg:block w-80 flex-shrink-0">
-          <div className="sticky top-10 space-y-12">
-            <FilterPanel isSidebar />
+        <aside className="hidden lg:block w-80 flex-shrink-0 border-r border-border/40">
+          <div className="sticky top-10 space-y-10 pr-8">
+            <div className="p-6 rounded-[2rem] bg-muted/10 border border-border/40 shadow-sm shadow-black/[0.02]">
+              <FilterPanel isSidebar />
+            </div>
 
-            <div className="p-8 rounded-[2.5rem] bg-muted/20 border border-border/40 space-y-5">
+            <div className="p-6 rounded-[2rem] bg-muted/20 border border-border/40 space-y-5">
               <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/50">
                 Market Intelligence
               </h4>
@@ -535,52 +590,6 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
 
         {/* Main Content */}
         <div className="flex-grow space-y-8 sm:space-y-12">
-          {/* Sticky Mobile Search & Tools */}
-          <div className="sticky top-20 lg:relative z-40 -mx-5 sm:mx-0 px-5 sm:px-0 py-4 lg:py-0 bg-background lg:bg-transparent border-b lg:border-none border-border/40 lg:shadow-none transition-all">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="relative flex-grow group/search">
-                  <div className="absolute inset-0 bg-primary/5 rounded-2xl lg:rounded-[2.5rem] blur-2xl opacity-0 group-focus-within/search:opacity-100 transition-opacity" />
-                  <div className="relative glass p-1.5 lg:p-2 rounded-2xl lg:rounded-[2.5rem] border border-border/60 shadow-lg shadow-black/[0.01]">
-                    <div className="relative flex items-center">
-                      <Search className="absolute left-5 lg:left-7 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-secondary/30 group-focus-within/search:text-primary transition-colors" />
-                      <input
-                        type="text"
-                        placeholder="Search model, keyword..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-transparent border-none rounded-xl lg:rounded-[2rem] pl-12 lg:pl-16 pr-5 lg:pr-8 py-3 lg:py-5.5 text-sm lg:text-base font-semibold focus:outline-none focus:ring-0 transition-all placeholder:text-secondary/20"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowFilters(true)}
-                  className="lg:hidden flex items-center justify-center w-12 h-12 rounded-2xl bg-foreground text-background transition-all hover:opacity-90 active:scale-90 shadow-lg shadow-foreground/10 flex-shrink-0"
-                >
-                  <SlidersHorizontal className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Mobile Quick Categories */}
-              <div className="lg:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.05em] transition-all border ${
-                      selectedCategory === cat
-                        ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/10"
-                        : "bg-muted/40 border-border/40 text-secondary"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
           {/* Active Chips */}
           {(searchTerm ||
             selectedCategory !== "All" ||

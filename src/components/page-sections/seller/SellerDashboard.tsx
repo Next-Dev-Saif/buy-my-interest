@@ -26,6 +26,8 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Controller } from "react-hook-form";
+import CustomSelect from "@/components/core-components/CustomSelect";
 
 const listingSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -97,6 +99,7 @@ export default function SellerDashboard() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset
   } = useForm<ListingFormValues>({
@@ -403,21 +406,24 @@ export default function SellerDashboard() {
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-secondary uppercase tracking-wider">
-                        Category
-                      </label>
-                      <select 
-                        {...register("category")}
-                        className="w-full bg-background border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm appearance-none cursor-pointer"
-                      >
-                        <option value="Houses">Houses</option>
-                        <option value="Cars">Cars</option>
-                        <option value="Pets">Pets</option>
-                        <option value="Plots">Plots</option>
-                      </select>
-                      {errors.category && <p className="text-red-500 text-[10px] font-bold">{errors.category.message}</p>}
-                    </div>
+                    <Controller
+                      name="category"
+                      control={control}
+                      render={({ field }) => (
+                        <CustomSelect
+                          label="Category"
+                          value={field.value}
+                          onChange={field.onChange}
+                          error={errors.category?.message}
+                          options={[
+                            { value: "Houses", label: "Houses" },
+                            { value: "Cars", label: "Cars" },
+                            { value: "Pets", label: "Pets" },
+                            { value: "Plots", label: "Plots" },
+                          ]}
+                        />
+                      )}
+                    />
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-secondary uppercase tracking-wider">

@@ -1,5 +1,4 @@
 import { MapPin, Clock, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import Image from "next/image";
 import { formatPrice } from "@/utils/price-utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +24,7 @@ interface InterestCardProps {
 
 export default function InterestCard({ data }: InterestCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
   const images = [data.imageUrl, ...(data.moreImages || [])].filter(Boolean);
   
   const formattedPrice = formatPrice(data.price);
@@ -32,12 +32,14 @@ export default function InterestCard({ data }: InterestCardProps) {
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setImageError(false);
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setImageError(false);
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
@@ -54,12 +56,30 @@ export default function InterestCard({ data }: InterestCardProps) {
             transition={{ duration: 0.2 }}
             className="absolute inset-0"
           >
-            <Image
-              src={images[currentImageIndex]}
-              alt={`${data.title}`}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
+            {imageError || !images[currentImageIndex] ? (
+              <div className="w-full h-full relative flex flex-col items-center justify-center bg-[#0a0a0f] overflow-hidden">
+                <img 
+                  src="/images/robot-fallback.png" 
+                  alt="Error" 
+                  className="w-full h-full object-cover opacity-60 mix-blend-lighten"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-0 w-full text-center px-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl">
+                    <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                    <span className="text-[9px] font-black text-white/70 uppercase tracking-[0.2em]">Data Hunt in Progress</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <img
+                src={images[currentImageIndex]}
+                alt={`${data.title}`}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
 

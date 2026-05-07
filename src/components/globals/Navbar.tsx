@@ -3,13 +3,16 @@ import Link from "next/link";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 import Container from "./Container";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import UserDropdown from "./UserDropdown";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, loading } = useAuth();
   const pathname = usePathname();
 
   // Close menu when route changes
@@ -33,9 +36,11 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Explore", href: "/explore-interests/test@example.com" }, // Placeholder email for now
+    { 
+      name: "Explore", 
+      href: user?.email ? `/explore-interests/${user.email}` : "/explore-interests/guest" 
+    },
     { name: "Pricing", href: "/#pricing" },
-    { name: "For Sellers", href: "/seller" },
   ];
 
   return (
@@ -52,12 +57,12 @@ export default function Navbar() {
         </div>
 
         <nav className="hidden lg:block">
-          <ul className="flex items-center gap-8 text-[13px] font-bold uppercase tracking-[0.1em]">
+          <ul className="flex items-center gap-10 text-[13px] font-black uppercase tracking-[0.15em]">
             {navLinks.map((link) => (
               <li key={link.name}>
                 <Link
                   href={link.href}
-                  className="text-secondary hover:text-primary transition-colors"
+                  className="text-secondary/70 hover:text-primary transition-all active:scale-95 block"
                 >
                   {link.name}
                 </Link>
@@ -66,17 +71,35 @@ export default function Navbar() {
           </ul>
         </nav>
 
-        <div className="flex-1 flex items-center justify-end gap-3 sm:gap-5">
+        <div className="flex-1 flex items-center justify-end gap-3 sm:gap-6">
           <div className="hidden sm:block">
             <ThemeToggle />
           </div>
 
-          <Link
-            href="/get-started"
-            className="hidden sm:flex px-7 py-3 text-[11px] font-black uppercase tracking-[0.15em] rounded-xl bg-foreground text-background hover:opacity-90 transition-all shadow-lg shadow-black/5 active:scale-95"
-          >
-            Get Started
-          </Link>
+          {!loading && (
+            <div className="hidden lg:flex items-center gap-4">
+              {user ? (
+                <UserDropdown />
+              ) : (
+                <div className="flex items-center gap-4">
+                  <Link
+                    href="/auth/login"
+                    className="text-[11px] font-black uppercase tracking-[0.2em] text-secondary hover:text-primary transition-colors px-2"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="px-6 py-3 text-[11px] font-black uppercase tracking-[0.2em] rounded-xl bg-foreground text-background hover:opacity-90 transition-all shadow-lg shadow-black/5 active:scale-95 flex items-center gap-2"
+                  >
+                    Join <ArrowRight size={14} />
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Mobile Toggle */}
 
           {/* Mobile Toggle */}
           <button
@@ -144,8 +167,34 @@ export default function Navbar() {
                   href="/get-started"
                   className="w-full py-5 flex items-center justify-center rounded-2xl bg-foreground text-background text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-foreground/10 active:scale-[0.98] transition-all"
                 >
-                  Get Started Now
+                  {user ? "Dashboard" : "Get Started Now"}
                 </Link>
+
+                {!user && !loading && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <Link
+                      href="/auth/login"
+                      className="py-4 flex items-center justify-center rounded-2xl border border-border/60 text-xs font-black uppercase tracking-[0.2em] active:scale-[0.98] transition-all"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/auth/signup"
+                      className="py-4 flex items-center justify-center rounded-2xl border border-border/60 text-xs font-black uppercase tracking-[0.2em] active:scale-[0.98] transition-all"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
+
+                {user && (
+                  <Link
+                    href="/profile"
+                    className="py-4 flex items-center justify-center rounded-2xl border border-border/60 text-xs font-black uppercase tracking-[0.2em] active:scale-[0.98] transition-all"
+                  >
+                    View Profile
+                  </Link>
+                )}
               </motion.div>
             </motion.nav>
           </div>
