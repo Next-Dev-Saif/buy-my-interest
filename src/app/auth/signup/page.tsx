@@ -7,6 +7,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/config/firebase";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { FaGoogle, FaGithub } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -22,7 +23,11 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       await updateProfile(userCredential.user, { displayName: name });
       router.push("/get-started");
     } catch (err: any) {
@@ -36,16 +41,22 @@ export default function SignupPage() {
     <div className="glass-dark p-8 md:p-10 rounded-[2.5rem] space-y-8 relative overflow-hidden group shadow-2xl">
       {/* Decorative element */}
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
-      
+
       <div className="text-center space-y-2 relative">
-        <h1 className="text-4xl font-editorial text-gradient">Create Account</h1>
-        <p className="text-muted-foreground">Start your personalized interest journey today</p>
+        <h1 className="text-4xl font-editorial text-gradient">
+          Create Account
+        </h1>
+        <p className="text-muted-foreground">
+          Start your personalized interest journey today
+        </p>
       </div>
 
       <form onSubmit={handleSignup} className="space-y-5 relative">
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-secondary">Full Name</label>
+            <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-secondary">
+              Full Name
+            </label>
             <div className="relative group">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
@@ -60,7 +71,9 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-secondary">Email Address</label>
+            <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-secondary">
+              Email Address
+            </label>
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
@@ -75,7 +88,9 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-secondary">Password</label>
+            <label className="text-xs font-black uppercase tracking-[0.2em] ml-1 text-secondary">
+              Password
+            </label>
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
@@ -91,7 +106,7 @@ export default function SignupPage() {
         </div>
 
         {error && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-destructive/10 border border-destructive/20 text-destructive text-xs p-4 rounded-2xl font-medium"
@@ -106,7 +121,9 @@ export default function SignupPage() {
           className="w-full bg-foreground text-background font-black uppercase tracking-[0.2em] text-xs py-4 rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group disabled:opacity-50 shadow-xl shadow-foreground/10"
         >
           {loading ? "Creating Account..." : "Sign Up"}
-          {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+          {!loading && (
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          )}
         </button>
       </form>
 
@@ -115,24 +132,33 @@ export default function SignupPage() {
           <div className="w-full border-t border-border/40"></div>
         </div>
         <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
-          <span className="bg-[#0b1011] px-3 text-muted-foreground/60">Or continue with</span>
+          <span className="bg-[#0b1011] px-3 text-muted-foreground/60">
+            Or continue with
+          </span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 relative">
         <button className="flex items-center justify-center gap-3 py-3.5 bg-input/20 border border-border/40 rounded-2xl hover:bg-input/30 transition-all active:scale-[0.98]">
           <FaGoogle className="w-4 h-4" />
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]">Google</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.1em]">
+            Google
+          </span>
         </button>
         <button className="flex items-center justify-center gap-3 py-3.5 bg-input/20 border border-border/40 rounded-2xl hover:bg-input/30 transition-all active:scale-[0.98]">
           <FaGithub className="w-4 h-4" />
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]">GitHub</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.1em]">
+            GitHub
+          </span>
         </button>
       </div>
 
       <p className="text-center text-[11px] font-bold text-muted-foreground relative">
         Already have an account?{" "}
-        <Link href="/auth/login" className="text-primary hover:underline uppercase tracking-widest ml-1">
+        <Link
+          href="/auth/login"
+          className="text-primary hover:underline uppercase tracking-widest ml-1"
+        >
           Log in
         </Link>
       </p>
