@@ -6,7 +6,9 @@ import {
   User,
   signOut as firebaseSignOut
 } from "firebase/auth";
-import { auth } from "@/config/firebase";
+import { auth, db } from "@/config/firebase";
+import { setAuthCookie, removeAuthCookie } from "@/utils/auth-cookies";
+import { checkProfileCompletion } from "@/utils/profile-check";
 
 interface AuthContextType {
   user: User | null;
@@ -28,12 +30,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       
-      // Set cookie for middleware
       if (user) {
         const token = await user.getIdToken();
-        document.cookie = `auth-token=${token}; path=/; max-age=2592000; SameSite=Lax`;
+        const profileCompleted = await checkProfileCompletion(user.email || "", user.uid);
+        await setAuthCookie(token, profileCompleted, user.email || undefined);
       } else {
-        document.cookie = "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        await removeAuthCookie();
       }
       
       setLoading(false);

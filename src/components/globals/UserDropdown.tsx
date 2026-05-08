@@ -83,7 +83,7 @@ export default function UserDropdown() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute right-0 mt-3 w-64 glass border border-border/60 rounded-3xl shadow-2xl shadow-black/10 overflow-hidden z-[110]"
+            className="absolute right-0 mt-3 w-64 bg-card border border-border/60 rounded-3xl shadow-2xl shadow-black/10 overflow-hidden z-[999]"
           >
             <div className="p-5 border-b border-border/40 bg-muted/20">
               <div className="flex items-center gap-3">

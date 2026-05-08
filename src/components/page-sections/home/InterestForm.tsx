@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useRouter } from "next/navigation";
+import { setAuthCookie } from "@/utils/auth-cookies";
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 import {
   Loader2,
   CheckCircle2,
@@ -50,6 +51,7 @@ export default function InterestForm() {
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -90,7 +92,12 @@ export default function InterestForm() {
 
   const handleNext = async () => {
     if (step === 0) {
-      setStep(1);
+      const fieldsToValidate: (keyof FormValues)[] = ["userType"];
+      if (!user?.displayName) fieldsToValidate.push("fullName");
+      if (!user?.email) fieldsToValidate.push("email");
+      
+      const isValid = await trigger(fieldsToValidate);
+      if (isValid) setStep(1);
       return;
     }
 
@@ -138,6 +145,7 @@ export default function InterestForm() {
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
+    setSubmitError(null);
 
     const urlParams = new URLSearchParams(window.location.search);
     const plan = urlParams.get("plan") || "free";
@@ -149,12 +157,25 @@ export default function InterestForm() {
       collectionName = "PremiumSubscribers";
 
     try {
+      // 1. Save to Firestore
       await addDoc(collection(db, collectionName), {
         ...data,
+        uid: user?.uid,
         plan,
+        profileCompleted: true,
         createdAt: serverTimestamp(),
       });
+      
+      // 2. Mark profile as completed in cookies
+      const cookieResult = await setAuthCookie(undefined, true, data.email, data.userType);
+      if (!cookieResult) {
+        throw new Error("Failed to synchronize session. Please try again.");
+      }
+      
+      // 3. Trigger success UI
       setIsSuccess(true);
+      
+      // 4. Redirect after delay
       setTimeout(() => {
         if (data.userType === "buyer") {
           router.push(`/explore-interests/${encodeURIComponent(data.email)}`);
@@ -162,9 +183,9 @@ export default function InterestForm() {
           router.push(`/seller/dashboard`);
         }
       }, 2000);
-    } catch (error) {
-      console.error("Error submitting form", error);
-      alert("Something went wrong. Please try again.");
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      setSubmitError(error.message || "Initialization failed. Our systems are currently under high load. Please try again in a moment.");
       setIsSubmitting(false);
     }
   };
@@ -210,10 +231,58 @@ export default function InterestForm() {
   const steps = [
     {
       id: 0,
-      title: "Identify Your Role",
-      desc: "Choose whether you are looking to buy or sell. This helps us customize your dashboard and matching engine.",
+      title: user?.displayName ? "Identify Your Role" : "Complete Your Profile",
+      desc: user?.displayName 
+        ? "Choose whether you are looking to buy or sell. This helps us customize your dashboard."
+        : "Please provide your basic details and select your primary role in the marketplace.",
       content: (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="space-y-8">
+          {(!user?.displayName || !user?.email) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8 border-b border-border/40">
+              {!user?.displayName && (
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1 text-secondary">
+                    Full Name
+                  </label>
+                  <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <input
+                      {...register("fullName")}
+                      placeholder="John Doe"
+                      className="w-full bg-input/40 border border-border/40 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:border-primary/50 focus:ring-8 focus:ring-primary/5 transition-all text-sm font-bold"
+                    />
+                  </div>
+                  {errors.fullName && (
+                    <p className="text-red-500 text-[10px] font-black uppercase tracking-wider ml-1">
+                      {errors.fullName.message}
+                    </p>
+                  )}
+                </div>
+              )}
+              {!user?.email && (
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1 text-secondary">
+                    Email Address
+                  </label>
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <input
+                      {...register("email")}
+                      placeholder="name@example.com"
+                      className="w-full bg-input/40 border border-border/40 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:border-primary/50 focus:ring-8 focus:ring-primary/5 transition-all text-sm font-bold"
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="text-red-500 text-[10px] font-black uppercase tracking-wider ml-1">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <button
             type="button"
             onClick={() => {
@@ -281,6 +350,7 @@ export default function InterestForm() {
             </div>
           </button>
         </div>
+      </div>
       ),
     },
     {
@@ -446,6 +516,16 @@ export default function InterestForm() {
                 {currentStepData.content}
               </motion.div>
             </AnimatePresence>
+
+            {submitError && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold text-center"
+              >
+                {submitError}
+              </motion.div>
+            )}
 
             <div className="flex items-center gap-4 mt-10 pt-8 border-t border-border/40">
               {step > 0 && (

@@ -77,11 +77,11 @@ export default function Navbar() {
           </div>
 
           {!loading && (
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="flex items-center gap-4">
               {user ? (
                 <UserDropdown />
               ) : (
-                <div className="flex items-center gap-4">
+                <div className="hidden lg:flex items-center gap-4">
                   <Link
                     href="/auth/login"
                     className="text-[11px] font-black uppercase tracking-[0.2em] text-secondary hover:text-primary transition-colors px-2"

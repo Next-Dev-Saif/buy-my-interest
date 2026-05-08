@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/config/firebase";
+import { setAuthCookie } from "@/utils/auth-cookies";
+import { checkProfileCompletion } from "@/utils/profile-check";
 import { Mail, Lock, ArrowRight } from "lucide-react";
-import { FaGoogle, FaGithub } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
@@ -22,8 +23,19 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/get-started");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      const profile = await checkProfileCompletion(email, userCredential.user.uid);
+      
+      await setAuthCookie(token, !!profile?.completed, email, profile?.userType);
+      
+      if (!profile || !profile.completed) {
+        router.push("/get-started");
+      } else if (profile.userType === "seller") {
+        router.push("/seller/dashboard");
+      } else {
+        router.push(`/explore-interests/${encodeURIComponent(email)}`);
+      }
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {
@@ -32,7 +44,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="glass-dark p-8 md:p-10 rounded-[2.5rem] space-y-8 relative overflow-hidden group shadow-2xl">
+    <div className="glass p-8 md:p-10 rounded-[2.5rem] space-y-8 relative overflow-hidden group shadow-2xl">
       {/* Decorative element */}
       <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
 
@@ -109,32 +121,6 @@ export default function LoginPage() {
           )}
         </button>
       </form>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border/40"></div>
-        </div>
-        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
-          <span className="bg-[#0b1011] px-3 text-muted-foreground/60">
-            Or continue with
-          </span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 relative">
-        <button className="flex items-center justify-center gap-3 py-3.5 bg-input/20 border border-border/40 rounded-2xl hover:bg-input/30 transition-all active:scale-[0.98]">
-          <FaGoogle className="w-4 h-4" />
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]">
-            Google
-          </span>
-        </button>
-        <button className="flex items-center justify-center gap-3 py-3.5 bg-input/20 border border-border/40 rounded-2xl hover:bg-input/30 transition-all active:scale-[0.98]">
-          <FaGithub className="w-4 h-4" />
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]">
-            GitHub
-          </span>
-        </button>
-      </div>
 
       <p className="text-center text-[11px] font-bold text-muted-foreground relative">
         Don&apos;t have an account?{" "}

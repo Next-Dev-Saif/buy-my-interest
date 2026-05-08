@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/config/firebase";
+import { setAuthCookie } from "@/utils/auth-cookies";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
-import { FaGoogle, FaGithub } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export default function SignupPage() {
@@ -29,6 +29,11 @@ export default function SignupPage() {
         password,
       );
       await updateProfile(userCredential.user, { displayName: name });
+      const token = await userCredential.user.getIdToken();
+      
+      // For a new signup, profile is always false initially
+      await setAuthCookie(token, false, email);
+      
       router.push("/get-started");
     } catch (err: any) {
       setError(err.message || "An error occurred during signup");
@@ -38,7 +43,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="glass-dark p-8 md:p-10 rounded-[2.5rem] space-y-8 relative overflow-hidden group shadow-2xl">
+    <div className="glass p-8 md:p-10 rounded-[2.5rem] space-y-8 relative overflow-hidden group shadow-2xl">
       {/* Decorative element */}
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
 
@@ -126,32 +131,6 @@ export default function SignupPage() {
           )}
         </button>
       </form>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border/40"></div>
-        </div>
-        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
-          <span className="bg-[#0b1011] px-3 text-muted-foreground/60">
-            Or continue with
-          </span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 relative">
-        <button className="flex items-center justify-center gap-3 py-3.5 bg-input/20 border border-border/40 rounded-2xl hover:bg-input/30 transition-all active:scale-[0.98]">
-          <FaGoogle className="w-4 h-4" />
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]">
-            Google
-          </span>
-        </button>
-        <button className="flex items-center justify-center gap-3 py-3.5 bg-input/20 border border-border/40 rounded-2xl hover:bg-input/30 transition-all active:scale-[0.98]">
-          <FaGithub className="w-4 h-4" />
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]">
-            GitHub
-          </span>
-        </button>
-      </div>
 
       <p className="text-center text-[11px] font-bold text-muted-foreground relative">
         Already have an account?{" "}

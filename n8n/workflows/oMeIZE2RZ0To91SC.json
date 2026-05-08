@@ -1,0 +1,1426 @@
+{
+  "updatedAt": "2026-05-08T10:58:43.979Z",
+  "createdAt": "2026-04-30T06:58:19.586Z",
+  "id": "oMeIZE2RZ0To91SC",
+  "name": "Buy Sell Chaser - Local",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { users: $input.all().flatMap(i => i.json.data), priority: 0 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        -416
+      ],
+      "id": "f6f5bc61-ea8b-4505-a3ba-06187b1a438c",
+      "name": "Set-Prio-0"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { users: $input.all().flatMap(i => i.json.data), priority: 1 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        -224
+      ],
+      "id": "034218b7-91a3-4562-a06c-78d4ca47bd23",
+      "name": "Set-Prio-1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { users: $input.all().flatMap(i => i.json.data), priority: 2 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        -16
+      ],
+      "id": "8d4df1b0-bacc-4682-81fa-713dafd33493",
+      "name": "Set-Prio-2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/v1/tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "users",
+              "value": "={{ $json.users }}"
+            },
+            {
+              "name": "priority",
+              "value": "={{ $json.priority }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2720,
+        -224
+      ],
+      "id": "4e423c03-9224-4a02-91a6-c3079d3d2500",
+      "name": "Enqueue-Tasks"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        384
+      ],
+      "id": "a80999ec-7bfa-4f93-9204-86cd600d99b6",
+      "name": "Trigger-Poll-Queue"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/tasks",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "1"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2176,
+        384
+      ],
+      "id": "09a1616e-71d2-4eca-88de-18a7c1f199b8",
+      "name": "Fetch-Pending-Task"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "has-tasks-id",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            },
+            {
+              "id": "5f2545c9-8ded-4ba0-a252-5197d0eb91b2",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2432,
+        384
+      ],
+      "id": "973daa01-7827-461b-9d6b-4233582d9cd8",
+      "name": "Has Tasks?"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "http://localhost:3000/api/v1/tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data[0].id }}"
+            },
+            {
+              "name": "status",
+              "value": "processing"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2720,
+        368
+      ],
+      "id": "fb1de40d-2f2c-404e-bb27-56d0e42caf08",
+      "name": "Mark-As-Processing"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $input.first().json.data[0].userData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2928,
+        368
+      ],
+      "id": "287cb236-475e-4466-8782-ab4e18d3b69b",
+      "name": "Extract-User-Data"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "http://localhost:3000/api/v1/tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $(\"Fetch-Pending-Task\").item.json.data[0].id }}"
+            },
+            {
+              "name": "status",
+              "value": "completed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        4240,
+        256
+      ],
+      "id": "434359e9-fb5d-4b1b-a3aa-5641f8062f46",
+      "name": "Mark-As-Completed"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        -416
+      ],
+      "id": "eb60f6ac-4c65-4bf4-9918-5e58966291b2",
+      "name": "Trigger-Premium-15m1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        -224
+      ],
+      "id": "94c4ccf3-eb80-4014-86fb-64f282457450",
+      "name": "Trigger-Priority-1h1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 4
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        -16
+      ],
+      "id": "4c20848e-9563-49ec-8517-1e30fd505947",
+      "name": "Trigger-Free-4h1"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "PremiumSubscribers"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2176,
+        -416
+      ],
+      "id": "b7af491a-c795-4401-b035-8849abb6485a",
+      "name": "Fetch-Premium1"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "PrioritySubscribers"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2176,
+        -224
+      ],
+      "id": "868cf46c-86e1-4759-8593-303d5d7c6adb",
+      "name": "Fetch-Priority1"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "FreeSubscribers"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2176,
+        -16
+      ],
+      "id": "bd948beb-5c90-440e-b3f3-ecda0a5610f8",
+      "name": "Fetch-Free1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3184,
+        384
+      ],
+      "id": "c9947f6a-fea8-4e37-bf02-335d63ac117e",
+      "name": "Flatten-Subscribers1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "10567928-b241-419d-822e-16fa32072a0f",
+              "leftValue": "={{ $json.userType }}",
+              "rightValue": "buyer",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3392,
+        400
+      ],
+      "id": "d0230852-49f8-4a31-86ea-0fb36c53a99c",
+      "name": "Buyer-Or-Seller1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3680,
+        384
+      ],
+      "id": "a748d6d6-62a0-4974-96fd-5f673e7158f8",
+      "name": "Loop Over Users1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3904,
+        288
+      ],
+      "id": "b3a03d19-e1dc-45ac-8ae3-18404caceea6",
+      "name": "Loop Complete1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let queries = []; for (const item of $input.all()) { const user = item.json; const interests = user.interestedItems || []; const locations = user.interestedLocations || []; for (const product of interests) { for (const location of locations) { queries.push({ json: { query: `${product} for sale in ${location}`, product, location, user: { fullName: user.fullName, email: user.email, userType: user.userType, plan: user.plan } } }); } } } return queries;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3904,
+        544
+      ],
+      "id": "a6d8bed1-94f5-4cbd-adb6-4158e6c02dc4",
+      "name": "Extract-Interested-Items1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4240,
+        560
+      ],
+      "id": "4fd720fa-41b4-49c2-8e41-ad4d9fb2410d",
+      "name": "Loop Over Interests1"
+    },
+    {
+      "parameters": {
+        "q": "={{ $json.query }}",
+        "location": "={{ $json.location }}",
+        "additionalFields": {
+          "as_epq": "={{ $json.product }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApi",
+      "typeVersion": 1,
+      "position": [
+        4464,
+        560
+      ],
+      "id": "b47bc5cc-d394-488a-a2db-14aca106a3bf",
+      "name": "Search-Google1",
+      "credentials": {
+        "serpApi": {
+          "id": "wlz9olLZfe0VOOcp",
+          "name": "SerpApi account"
+        }
+      },
+      "onError": "continue"
+    },
+    {
+      "parameters": {
+        "jsCode": "const userContext = $(\"Extract-Interested-Items1\").first().json.user; const currentEmail = userContext.email; const groups = {}; const allQueries = $(\"Extract-Interested-Items1\").all(); for (const item of $(\"Search-Google1\").all()) { const inputIndex = item.pairedItem?.item; if (inputIndex !== undefined && allQueries[inputIndex]) { const inputData = allQueries[inputIndex].json; const itemUserEmail = inputData.user?.email; if (itemUserEmail === currentEmail) { if (!groups[currentEmail]) { groups[currentEmail] = { userEmail: currentEmail, results: [] }; } const organic = item.json.organic_results || []; groups[currentEmail].results.push(...organic.map(r => ({ ...r, category: inputData.product }))); } } } return Object.values(groups).map(g => ({ json: g }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4464,
+        352
+      ],
+      "id": "2a3a54ca-8a78-43eb-b55f-1a48af58075f",
+      "name": "Aggregate-Search-Results1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let items = []; for (const item of $input.all()) { const { results, userEmail } = item.json; results.slice(0, 5).forEach((result) => { items.push({ json: { userEmail, link: result.link, category: result.category } }); }); } return items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4672,
+        336
+      ],
+      "id": "f8ddfdee-c184-4079-b5a5-2d5605edb4fe",
+      "name": "Convert-To-Individual-Links1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4928,
+        336
+      ],
+      "id": "10420009-39ea-48f9-8a7c-a25bbada853d",
+      "name": "Loop Over Links1"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/check-match",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userEmail",
+              "value": "={{ $json.userEmail }}"
+            },
+            {
+              "name": "sourceUrl",
+              "value": "={{ $json.link }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        5184,
+        352
+      ],
+      "id": "4d0dc2db-3a6a-46e5-a0fe-e1972b516c25",
+      "name": "Check-Match1",
+      "onError": "continue"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8f2a3b4c-5d6e-7f8g-9h0i-1j2k3l4m5n6o",
+              "leftValue": "={{ $json.exists }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5424,
+        352
+      ],
+      "id": "24e6fdfb-2e07-4cce-814c-ed4b2e0f611e",
+      "name": "Match-Exists?1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.link }}",
+        "options": {},
+        "formats": [
+          "html"
+        ]
+      },
+      "type": "n8n-nodes-browserless-api.browserless",
+      "typeVersion": 1,
+      "position": [
+        5680,
+        448
+      ],
+      "id": "76402a66-df00-41a2-9516-dc12e8154763",
+      "name": "Scrape-Page1",
+      "credentials": {
+        "browserlessApi": {
+          "id": "ciqbcJVqV6XGKAR2",
+          "name": "Browserless account"
+        }
+      },
+      "onError": "continue"
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractCleanBody(html) { if (!html) return ''; const bodyMatch = html.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/i); let body = bodyMatch ? bodyMatch[1] : html; body = body.replace(/<script[\\s\\S]*?<\\/script>/gi, ''); body = body.replace(/<style[\\s\\S]*?<\\/style>/gi, ''); body = body.replace(/<noscript[\\s\\S]*?<\\/noscript>/gi, ''); body = body.replace(/<svg[\\s\\S]*?<\\/svg>/gi, ''); body = body.replace(/<iframe[\\s\\S]*?<\\/iframe>/gi, ''); body = body.replace(/<!--[\\s\\S]*?-->/g, ''); body = body.replace(/\\s+/g, ' ').trim(); const MAX_CHARS = 108000; if (body.length > MAX_CHARS) body = body.slice(0, MAX_CHARS); return body; } const html = $json.content || ''; const bodyContent = extractCleanBody(html); return [{ json: { bodyContent } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5920,
+        448
+      ],
+      "id": "91753a15-f669-40ce-a2e8-c571b8a609a3",
+      "name": "DOM Body Extractor1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract product data from this HTML. \\n\\nLink : {{ $('Loop Over Links1').item.json.link }}\\nLocation context: {{ $(\"Extract-Interested-Items1\").item.json.location }}\\nHTML Snippet: {{ $json.bodyContent }}",
+        "options": {
+          "systemMessage": "=You are a specialized Data Extraction Agent for BuyMyInterests.ai.\\n\\nYour task is to extract high-quality structured data from the provided HTML for the category: {{ $(\"Loop Over Interests1\").item.json.product }}.\\n\\nRULES:\\n1. Output ONLY a valid JSON array of objects inside an 'items' key.\\n2. Do NOT use markdown code blocks.\\n3. If no relevant items are found, return {\"items\": []}.\\n4. IMPORTANT: Each item MUST include the 'category' and 'location' provided in the context.\\n\\nJSON STRUCTURE:\\n{\\n  \"items\": [\\n    {\\n      \"title\": \"string\",\\n      \"price\": \"string\",\\n      \"category\": \"{{ $(\"Loop Over Interests1\").item.json.product }}\",\\n      \"location\": \"{{ $(\"Loop Over Interests1\").item.json.location }}\",\\n      \"description\": \"string\",\\n      \"imageUrl\": \"string\",\\n      \"moreImagesURLS\": [\"string\"],\\n      \"sourceUrl\": \"{{ $('Loop Over Links1').item.json.link }}\",\\n      \"dateScraped\": \"{{ $now.toISO() }}\",\\n      \"metadata\": {\\n         \"condition\": \"New/Used\",\\n         \"specifications\": {}\\n      }\\n    }\\n  ]\\n}\\n\\nBe extremely precise with prices. Keep the currency symbol if present."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        6176,
+        448
+      ],
+      "id": "ce128bfb-c285-4303-ab28-fe947a4ab548",
+      "name": "Intelligence-Extractor1",
+      "onError": "continue"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "FreeSubscribers"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3664,
+        688
+      ],
+      "id": "fetch-free-buyers-id",
+      "name": "Fetch-Free-Buyers"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "PrioritySubscribers"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3664,
+        864
+      ],
+      "id": "fetch-prio-buyers-id",
+      "name": "Fetch-Priority-Buyers"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/v1/get-subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "collection",
+              "value": "PremiumSubscribers"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3664,
+        1024
+      ],
+      "id": "fetch-prem-buyers-id",
+      "name": "Fetch-Premium-Buyers"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seller = $(\"Buyer-Or-Seller1\").first().json;\nconst sellerInterests = (seller.interestedItems || []).map(i => i.toLowerCase().trim());\nconst sellerLocations = (seller.interestedLocations || []).map(l => l.toLowerCase().trim());\n\n// Correctly extract the 'data' array from the HTTP response objects\nconst extractData = (nodeName) => {\n  try {\n    const response = $(nodeName).first().json;\n    return response.data || [];\n  } catch (e) {\n    return [];\n  }\n};\n\nconst allBuyers = [\n  ...extractData(\"Fetch-Free-Buyers\"),\n  ...extractData(\"Fetch-Priority-Buyers\"),\n  ...extractData(\"Fetch-Premium-Buyers\")\n];\n\nconst matches = [];\nfor (const buyer of allBuyers) {\n  if (buyer.userType !== 'buyer' || buyer.email === seller.email) continue;\n\n  // Handle both array and string interests (robustness)\n  const bInterests = Array.isArray(buyer.interestedItems) ? buyer.interestedItems : [buyer.interestedItems || \"\"];\n  const bLocations = Array.isArray(buyer.interestedLocations) ? buyer.interestedLocations : [buyer.interestedLocations || \"\"];\n\n  const buyerInterests = bInterests.map(i => i.toLowerCase().trim());\n  const buyerLocations = bLocations.map(l => l.toLowerCase().trim());\n\n  const sharedInterests = sellerInterests.filter(si => \n    buyerInterests.some(bi => bi.includes(si) || si.includes(bi))\n  );\n  \n  const sharedLocations = sellerLocations.filter(sl => \n    buyerLocations.some(bl => bl.includes(sl) || sl.includes(bl))\n  );\n\n  if (sharedInterests.length > 0 && sharedLocations.length > 0) {\n    matches.push({\n      title: `Interested Buyer: ${buyer.fullName}`,\n      price: 'Prospect Found',\n      category: sharedInterests[0],\n      location: sharedLocations[0],\n      description: `${buyer.fullName} is interested in ${bInterests.join(', ')} in ${bLocations.join(', ')}.`,\n      imageUrl: '',\n      sourceUrl: `mailto:${buyer.email}`,\n      dateScraped: new Date().toISOString(),\n      metadata: {\n        buyerEmail: buyer.email,\n        sharedInterests,\n        sharedLocations\n      }\n    });\n  }\n}\n\nreturn { userEmail: seller.email, matches };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3936,
+        848
+      ],
+      "id": "seller-matching-id",
+      "name": "Seller-Matching-Logic"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/v1/update-matches",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userEmail",
+              "value": "={{ $json.userEmail }}"
+            },
+            {
+              "name": "matches",
+              "value": "={{ $json.matches }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        4208,
+        864
+      ],
+      "id": "push-seller-matches-id",
+      "name": "Push-Seller-Matches"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
+      "typeVersion": 1,
+      "position": [
+        6176,
+        640
+      ],
+      "id": "29f68236-c697-409d-842f-87ea8a7e1ab7",
+      "name": "AI-Model1",
+      "credentials": {
+        "cohereApi": {
+          "id": "aZ3UG6Y6ejbzzj4I",
+          "name": "Cohere account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let allPassed = true;\nconst results = [];\n\n// Helper function to clean common AI-generated JSON wrappers/issues\nfunction cleanJsonString(str) {\n  if (typeof str !== \"string\") return str;\n\n  let cleaned = str.trim();\n\n  // Remove markdown code fences\n  cleaned = cleaned.replace(/^```(?:json)?\\s*/i, \"\");\n  cleaned = cleaned.replace(/\\s*```$/i, \"\");\n\n  // Remove surrounding backticks\n  cleaned = cleaned.replace(/^`+|`+$/g, \"\");\n\n  // Remove leading/trailing unwanted text before/after JSON\n  const firstBrace = cleaned.search(/[\\[{]/);\n  const lastBrace = Math.max(\n    cleaned.lastIndexOf(\"}\"),\n    cleaned.lastIndexOf(\"]\")\n  );\n\n  if (firstBrace !== -1 && lastBrace !== -1) {\n    cleaned = cleaned.slice(firstBrace, lastBrace + 1);\n  }\n\n  // Remove BOM and invisible characters\n  cleaned = cleaned.replace(/^\\uFEFF/, \"\");\n\n  return cleaned.trim();\n}\n\nfor (const item of $input.all()) {\n  try {\n    let rawOutput = item.json.output;\n\n    // First attempt: direct parse\n    try {\n      results.push({\n        isPassed: true,\n        output: JSON.parse(rawOutput),\n      });\n      continue;\n    } catch (_) {}\n\n    // Second attempt: cleaned parse\n    const cleanedOutput = cleanJsonString(rawOutput);\n\n    try {\n      results.push({\n        isPassed: true,\n        output: JSON.parse(cleanedOutput),\n      });\n    } catch (e) {\n      results.push({\n        isPassed: false,\n        output: item.json.output,\n        error: e.message,\n      });\n\n      allPassed = false;\n    }\n  } catch (e) {\n    results.push({\n      isPassed: false,\n      output: item.json.output,\n      error: e.message,\n    });\n\n    allPassed = false;\n  }\n}\n\nreturn [\n  {\n    json: {\n      isPassed: allPassed,\n      details: results,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6464,
+        448
+      ],
+      "id": "4ba7428c-8bee-4214-9280-3af0435e0b01",
+      "name": "JSON VERIFIER1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/v1/update-matches",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "G-SQ6RTB6BKE"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userEmail",
+              "value": "={{ $(\"Convert-To-Individual-Links1\").item.json.userEmail }}"
+            },
+            {
+              "name": "matches",
+              "value": "={{ $json.details[0].output.items }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6672,
+        448
+      ],
+      "id": "64bc6dff-2c07-45f8-a887-78ad3e183276",
+      "name": "Push-To-Website1"
+    }
+  ],
+  "connections": {
+    "Set-Prio-0": {
+      "main": [
+        [
+          {
+            "node": "Enqueue-Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set-Prio-1": {
+      "main": [
+        [
+          {
+            "node": "Enqueue-Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set-Prio-2": {
+      "main": [
+        [
+          {
+            "node": "Enqueue-Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger-Poll-Queue": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Pending-Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch-Pending-Task": {
+      "main": [
+        [
+          {
+            "node": "Has Tasks?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Tasks?": {
+      "main": [
+        [
+          {
+            "node": "Mark-As-Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark-As-Processing": {
+      "main": [
+        [
+          {
+            "node": "Extract-User-Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract-User-Data": {
+      "main": [
+        [
+          {
+            "node": "Flatten-Subscribers1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger-Premium-15m1": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Premium1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger-Priority-1h1": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Priority1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger-Free-4h1": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Free1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch-Premium1": {
+      "main": [
+        [
+          {
+            "node": "Set-Prio-0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch-Priority1": {
+      "main": [
+        [
+          {
+            "node": "Set-Prio-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch-Free1": {
+      "main": [
+        [
+          {
+            "node": "Set-Prio-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten-Subscribers1": {
+      "main": [
+        [
+          {
+            "node": "Buyer-Or-Seller1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buyer-Or-Seller1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Users1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch-Free-Buyers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch-Free-Buyers": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Priority-Buyers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch-Priority-Buyers": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Premium-Buyers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch-Premium-Buyers": {
+      "main": [
+        [
+          {
+            "node": "Seller-Matching-Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seller-Matching-Logic": {
+      "main": [
+        [
+          {
+            "node": "Push-Seller-Matches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push-Seller-Matches": {
+      "main": [
+        [
+          {
+            "node": "Mark-As-Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Users1": {
+      "main": [
+        [
+          {
+            "node": "Loop Complete1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract-Interested-Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Complete1": {
+      "main": [
+        [
+          {
+            "node": "Mark-As-Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract-Interested-Items1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Interests1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Interests1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate-Search-Results1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search-Google1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search-Google1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Interests1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate-Search-Results1": {
+      "main": [
+        [
+          {
+            "node": "Convert-To-Individual-Links1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert-To-Individual-Links1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Links1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Links1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Users1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check-Match1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check-Match1": {
+      "main": [
+        [
+          {
+            "node": "Match-Exists?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match-Exists?1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Links1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scrape-Page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape-Page1": {
+      "main": [
+        [
+          {
+            "node": "DOM Body Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOM Body Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Intelligence-Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intelligence-Extractor1": {
+      "main": [
+        [
+          {
+            "node": "JSON VERIFIER1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI-Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Intelligence-Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON VERIFIER1": {
+      "main": [
+        [
+          {
+            "node": "Push-To-Website1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push-To-Website1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Links1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6ddc6927-b058-43e8-a2a3-22ebfa12e6e0",
+  "activeVersionId": null,
+  "versionCounter": 115,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-30T06:58:19.590Z",
+      "createdAt": "2026-04-30T06:58:19.590Z",
+      "role": "workflow:owner",
+      "workflowId": "oMeIZE2RZ0To91SC",
+      "projectId": "kRV8eUdvS0WRoSPc",
+      "project": {
+        "updatedAt": "2026-04-30T06:55:55.759Z",
+        "createdAt": "2026-04-30T06:54:39.634Z",
+        "id": "kRV8eUdvS0WRoSPc",
+        "name": "Mr Saif <bombhacksbomb@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "4a324b35-7c17-4022-bb76-2ef044f77f84"
+      }
+    }
+  ],
+  "tags": [
+    {
+      "updatedAt": "2026-04-30T06:58:32.534Z",
+      "createdAt": "2026-04-30T06:58:32.534Z",
+      "id": "HrG9vqb4VtIfno3X",
+      "name": "Multiple-Users"
+    },
+    {
+      "updatedAt": "2026-04-30T06:58:32.525Z",
+      "createdAt": "2026-04-30T06:58:32.525Z",
+      "id": "IeUlvQ0xk1NgF4PN",
+      "name": "Business"
+    },
+    {
+      "updatedAt": "2026-04-30T06:58:32.530Z",
+      "createdAt": "2026-04-30T06:58:32.530Z",
+      "id": "f9tYErocj88gDSoA",
+      "name": "Subscription"
+    }
+  ],
+  "activeVersion": null
+}

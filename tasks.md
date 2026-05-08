@@ -24,6 +24,7 @@
 - [x] Implement Login page with Firebase Auth <!-- id: 30 -->
 - [x] Create User Profile settings page <!-- id: 31 -->
 - [x] Implement middleware for route protection (/get-started) <!-- id: 32 -->
+- [x] Fix auth-token cookie race condition and synchronization <!-- id: 35 -->
 - [x] Update Navbar for auth states (Login/Signup vs Profile/Logout) <!-- id: 33 -->
 - [x] Ensure consistent styling and error handling across auth flows <!-- id: 34 -->
 
@@ -41,3 +42,4 @@
 - [x] Reposition search bar to the top of the container and add significant bottom margin <!-- id: 24 -->
 - [x] Reduce vertical spacing between page header and search bar for a tighter layout <!-- id: 25 -->
 - [x] Group header and search bar into a dedicated stack to resolve fragmented spacing <!-- id: 26 -->
+- [x] Resolved auth redirection issue by centralizing cookie management and eliminating race conditions between client-side redirects and token generation. <!-- id: 35 -->

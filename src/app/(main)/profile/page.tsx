@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -98,10 +99,24 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20 pt-10 sm:px-6 ">
-      <div className="max-w-[1100px] mx-auto space-y-12">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-8 border-b border-border/40">
+    <div className="bg-background pb-40 pt-6 sm:pt-10 sm:px-6">
+      <div className="max-w-[1100px] mx-auto sm:space-y-12">
+        
+        {/* Mobile Header - Native Feel */}
+        <div className="flex items-center justify-between px-6 mb-8 sm:hidden">
+          <div className="flex flex-col">
+            <h2 className="text-3xl font-black font-editorial text-foreground">Account</h2>
+            <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em]">{activeTab}</p>
+          </div>
+          <div className="flex items-center gap-2">
+             <div className="w-10 h-10 rounded-2xl bg-muted border border-border/60 flex items-center justify-center text-foreground font-black text-xs">
+                {user.displayName?.[0] || user.email?.[0]?.toUpperCase()}
+              </div>
+          </div>
+        </div>
+
+        {/* Desktop Header Section */}
+        <div className="hidden sm:flex flex-col md:flex-row md:items-end justify-between gap-8 pb-8 border-b border-border/40">
           <div className="space-y-4">
             <h1 className="text-5xl lg:text-7xl font-black font-editorial tracking-tight text-foreground">
               Account <span className="text-primary">Overview.</span>
@@ -127,9 +142,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Sidebar Navigation */}
-          <div className="lg:col-span-3 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-12">
+          {/* Sidebar Navigation - Hidden on Mobile */}
+          <div className="hidden lg:block lg:col-span-3 space-y-8">
             <div className="flex flex-col gap-2">
               {tabs.map((tab) => (
                 <button
@@ -176,19 +191,19 @@ export default function ProfilePage() {
           </div>
 
           {/* Main Content Area */}
-          <div className="lg:col-span-9">
+          <div className="lg:col-span-9 px-6 sm:px-0">
             <AnimatePresence mode="wait">
               {activeTab === "personal" && (
                 <motion.div
                   key="personal"
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-8"
+                  exit={{ opacity: 0, x: -10 }}
+                  className="space-y-6 sm:space-y-8"
                 >
-                  <div className="glass rounded-[2.5rem] p-8 md:p-12 border border-border/60">
-                    <form onSubmit={handleUpdate} className="space-y-8">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="glass rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-border/60">
+                    <form onSubmit={handleUpdate} className="space-y-6 sm:space-y-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         <div className="space-y-3">
                           <label className="text-[10px] font-black text-secondary/60 uppercase tracking-[0.2em] ml-1">
                             Full Name
@@ -241,7 +256,7 @@ export default function ProfilePage() {
                         <button
                           type="submit"
                           disabled={isUpdating}
-                          className="flex items-center gap-3 bg-foreground text-background px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 shadow-xl shadow-foreground/10"
+                          className="w-full sm:w-auto flex items-center justify-center gap-3 bg-foreground text-background px-8 py-5 sm:py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 shadow-xl shadow-foreground/10"
                         >
                           {isUpdating ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -254,7 +269,18 @@ export default function ProfilePage() {
                     </form>
                   </div>
 
-                  <div className="glass rounded-[2.5rem] p-8 md:p-12 border border-border/60 flex flex-col md:flex-row items-center gap-8">
+                  {/* Danger Zone / Log Out for Mobile */}
+                  <div className="sm:hidden space-y-4">
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full py-5 rounded-2xl border border-red-500/20 bg-red-500/5 text-red-500 text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3"
+                    >
+                      <LogOut size={14} />
+                      Log Out of Account
+                    </button>
+                  </div>
+
+                  <div className="glass rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-border/60 flex flex-col md:flex-row items-center gap-6 sm:gap-8">
                     <Shield className="w-10 h-10 text-primary" />
                     <div className="flex-1 space-y-2 text-center md:text-left">
                       <h3 className="text-2xl font-black font-editorial">
@@ -266,7 +292,7 @@ export default function ProfilePage() {
                         any time.
                       </p>
                     </div>
-                    <button className="px-8 py-4 rounded-2xl border border-border/60 text-[10px] font-black uppercase tracking-widest hover:bg-muted/50 transition-all active:scale-95">
+                    <button className="w-full sm:w-auto px-8 py-4 rounded-2xl border border-border/60 text-[10px] font-black uppercase tracking-widest hover:bg-muted/50 transition-all active:scale-95">
                       Manage Security
                     </button>
                   </div>
@@ -276,12 +302,12 @@ export default function ProfilePage() {
               {activeTab === "notifications" && (
                 <motion.div
                   key="notifications"
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
+                  exit={{ opacity: 0, x: -10 }}
                   className="space-y-8"
                 >
-                  <div className="glass rounded-[2.5rem] p-8 md:p-12 border border-border/60 space-y-10">
+                  <div className="glass rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-border/60 space-y-8 sm:space-y-10">
                     <div className="space-y-2">
                       <h3 className="text-3xl font-black font-editorial">
                         Market Alerts
@@ -292,42 +318,42 @@ export default function ProfilePage() {
                       </p>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {[
                         {
                           id: "email" as const,
                           label: "Email Notifications",
-                          desc: "Receive alerts about new matches directly in your inbox.",
+                          desc: "Receive alerts about matches in your inbox.",
                         },
                         {
                           id: "push" as const,
                           label: "Browser Alerts",
-                          desc: "Get real-time browser notifications for important updates.",
+                          desc: "Get real-time notifications.",
                         },
                         {
                           id: "weekly" as const,
                           label: "Weekly Summary",
-                          desc: "A curated digest of market activities and recommendations.",
+                          desc: "A curated digest of recommendations.",
                         },
                       ].map((item) => (
                         <div
                           key={item.id}
-                          className="flex items-center justify-between p-6 rounded-[2rem] bg-muted/20 border border-border/40"
+                          className="flex items-center justify-between p-5 sm:p-6 rounded-[2rem] bg-muted/20 border border-border/40"
                         >
-                          <div className="space-y-1">
-                            <span className="text-base font-black text-foreground">
+                          <div className="space-y-1 flex-1">
+                            <span className="text-sm sm:text-base font-black text-foreground">
                               {item.label}
                             </span>
-                            <p className="text-xs text-secondary font-medium">
+                            <p className="text-[10px] sm:text-xs text-secondary font-medium">
                               {item.desc}
                             </p>
                           </div>
                           <div
                             onClick={() => toggleNotification(item.id)}
-                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-300 ${notifications[item.id] ? "bg-primary" : "bg-muted"}`}
+                            className={`w-10 h-5 sm:w-12 sm:h-6 rounded-full p-1 cursor-pointer transition-colors duration-300 ${notifications[item.id] ? "bg-primary" : "bg-muted"}`}
                           >
                             <div
-                              className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300 ${notifications[item.id] ? "translate-x-6" : "translate-x-0"}`}
+                              className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-white shadow-sm transition-transform duration-300 ${notifications[item.id] ? "translate-x-5 sm:translate-x-6" : "translate-x-0"}`}
                             />
                           </div>
                         </div>
@@ -340,30 +366,28 @@ export default function ProfilePage() {
               {activeTab === "billing" && (
                 <motion.div
                   key="billing"
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-12"
+                  exit={{ opacity: 0, x: -10 }}
+                  className="space-y-8 sm:space-y-12"
                 >
-                  {/* Current Status Card */}
-                  <div className="glass rounded-[2.5rem] p-8 md:p-12 border border-border/60 bg-muted/30 relative overflow-hidden">
+                  <div className="glass rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-border/60 bg-muted/30 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full -mr-32 -mt-32" />
                     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                       <div className="space-y-4 text-center md:text-left">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/60 text-secondary text-[10px] font-black uppercase tracking-widest">
                           Account Status
                         </div>
-                        <h3 className="text-5xl lg:text-7xl font-black font-editorial tracking-tight text-foreground">
+                        <h3 className="text-4xl sm:text-5xl lg:text-7xl font-black font-editorial tracking-tight text-foreground">
                           Free Plan.
                         </h3>
-                        <p className="text-secondary font-medium leading-relaxed max-w-sm">
-                          Your current search capacity is limited. Upgrade to
-                          professional plans for global coverage and real-time
-                          alerts.
+                        <p className="text-secondary font-medium leading-relaxed max-w-sm text-sm">
+                          Your search capacity is limited. Upgrade to
+                          professional for global coverage.
                         </p>
                       </div>
-                      <div className="flex flex-col items-center p-8 rounded-[3rem] border border-border/40 bg-background/50 backdrop-blur-xl">
-                        <span className="text-4xl font-black font-editorial text-foreground">
+                      <div className="flex flex-col items-center p-6 sm:p-8 rounded-[2.5rem] sm:rounded-[3rem] border border-border/40 bg-background/50 backdrop-blur-xl">
+                        <span className="text-3xl sm:text-4xl font-black font-editorial text-foreground">
                           $0
                         </span>
                         <span className="text-[10px] font-bold text-secondary uppercase tracking-widest mt-1">
@@ -373,12 +397,11 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {/* Plans */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="glass rounded-[2.5rem] p-8 border border-primary/40 flex flex-col justify-between group hover:border-primary transition-all duration-500">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                    <div className="glass rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-primary/40 flex flex-col justify-between group hover:border-primary transition-all duration-500">
                       <div className="space-y-4">
                         <Zap size={32} className="text-primary" />
-                        <h4 className="text-3xl font-black font-editorial tracking-tight">
+                        <h4 className="text-2xl sm:text-3xl font-black font-editorial tracking-tight">
                           Professional.
                         </h4>
                         <ul className="space-y-3">
@@ -400,45 +423,83 @@ export default function ProfilePage() {
                           ))}
                         </ul>
                       </div>
-                      <button className="mt-10 w-full py-5 rounded-2xl bg-primary text-primary-foreground text-xs font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary/20">
-                        Upgrade to Professional
-                      </button>
-                    </div>
+                    <Link 
+                      href="/checkout/pro"
+                      className="mt-8 sm:mt-10 w-full py-5 rounded-2xl bg-primary text-primary-foreground text-xs font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary/20 text-center"
+                    >
+                      Upgrade
+                    </Link>
+                  </div>
 
-                    <div className="glass rounded-[2.5rem] p-8 border border-border/60 flex flex-col justify-between group hover:border-foreground/40 transition-all duration-500">
-                      <div className="space-y-4">
-                        <Sparkles size={32} className="text-foreground" />
-                        <h4 className="text-3xl font-black font-editorial tracking-tight">
-                          Enterprise.
-                        </h4>
-                        <ul className="space-y-3">
-                          {[
-                            "Deep Market Analytics",
-                            "Concierge Support",
-                            "Custom Search Protocols",
-                          ].map((f) => (
-                            <li
-                              key={f}
-                              className="flex items-center gap-3 text-xs font-bold text-secondary"
-                            >
-                              <CheckCircle2
-                                size={14}
-                                className="text-foreground/40"
-                              />
-                              {f}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <button className="mt-10 w-full py-5 rounded-2xl border border-border/60 text-xs font-black uppercase tracking-widest hover:bg-muted/50 active:scale-95 transition-all">
-                        Contact Sales
-                      </button>
+                  <div className="glass rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-primary/40 flex flex-col justify-between group hover:border-primary transition-all duration-500">
+                    <div className="space-y-4">
+                      <Sparkles size={32} className="text-foreground" />
+                      <h4 className="text-2xl sm:text-3xl font-black font-editorial tracking-tight">
+                        Enterprise.
+                      </h4>
+                      <ul className="space-y-3">
+                        {[
+                          "Deep Market Analytics",
+                          "Concierge Support",
+                          "Custom Search Protocols",
+                        ].map((f) => (
+                          <li
+                            key={f}
+                            className="flex items-center gap-3 text-xs font-bold text-secondary"
+                          >
+                            <CheckCircle2
+                              size={14}
+                              className="text-foreground/40"
+                            />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
+                    <Link 
+                      href="/checkout/elite"
+                      className="mt-8 sm:mt-10 w-full py-5 rounded-2xl bg-primary text-primary-foreground text-xs font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary/20 text-center"
+                    >
+                      Go Elite
+                    </Link>
+                  </div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Bottom Navigation - Native App Feel */}
+      <div className="sm:hidden fixed bottom-6 inset-x-6 z-[100]">
+        <div className="bg-card/90 backdrop-blur-xl rounded-[2.5rem] p-2 flex items-center justify-between border border-border/40 shadow-2xl shadow-black/10">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex items-center justify-center flex-1 py-4 rounded-2xl transition-all duration-500 ${
+                  isActive ? "text-primary" : "text-muted-foreground/50"
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="mobile-tab-pill"
+                    className="absolute inset-0 bg-primary/10 rounded-2xl"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <div className="relative flex flex-col items-center gap-1">
+                  <tab.icon size={isActive ? 22 : 20} className="transition-all" />
+                  <span className={`text-[8px] font-black uppercase tracking-widest transition-all ${isActive ? "opacity-100" : "opacity-0 h-0"}`}>
+                    {tab.label}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

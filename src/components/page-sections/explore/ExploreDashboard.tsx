@@ -36,6 +36,8 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
   const searchParams = useSearchParams();
 
   const [results, setResults] = useState<InterestResult[]>([]);
+  const [sellerListings, setSellerListings] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<"marketplace" | "platform">("platform");
   const [loading, setLoading] = useState(true);
 
   // Basic Filters
@@ -91,11 +93,12 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
   useEffect(() => {
     async function fetchResults() {
       try {
-        const q = query(
+        // 1. Fetch external results
+        const qMarket = query(
           collection(db, "search_results"),
           where("userId", "==", email),
         );
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(qMarket);
 
         const data: InterestResult[] = [];
         querySnapshot.forEach((doc) => {
@@ -103,18 +106,31 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
           data.push({
             id: doc.id,
             ...docData,
-            // Ensure dateScraped exists or fallback
-            dateScraped:
-              docData.dateScraped ||
-              (docData.timestamp
-                ? new Date(
-                    docData.timestamp.seconds * 1000,
-                  ).toLocaleDateString()
-                : new Date().toLocaleDateString()),
+            dateScraped: docData.dateScraped || (docData.timestamp ? new Date(docData.timestamp.seconds * 1000).toLocaleDateString() : new Date().toLocaleDateString()),
           } as InterestResult);
         });
-
         setResults(data);
+
+        // 2. Fetch platform seller listings
+        const qPlatform = query(
+          collection(db, "seller_listings"),
+          where("status", "==", "Active")
+        );
+        const platformSnapshot = await getDocs(qPlatform);
+        const pData = platformSnapshot.docs.map(doc => {
+          const item = doc.data();
+          return {
+            id: doc.id,
+            ...item,
+            imageUrl: item.image || "",
+            dateScraped: item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : new Date().toLocaleDateString(),
+            sourceUrl: `mailto:${item.userId}`, // Contact the seller directly
+            isPlatformVerified: true,
+            timestamp: item.createdAt
+          };
+        });
+        setSellerListings(pData);
+
       } catch (error) {
         console.error("Error fetching results", error);
       } finally {
@@ -203,7 +219,9 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
   ];
 
   const processedResults = useMemo(() => {
-    let filtered = results.filter((item) => {
+    const currentData = viewMode === "marketplace" ? results : sellerListings;
+    
+    let filtered = currentData.filter((item) => {
       const matchesSearch =
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -222,7 +240,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
       const matchesNew = !onlyNew || Boolean(item.isNew);
 
       const matchesGallery =
-        !hasGallery || (item.moreImages?.filter(Boolean).length ?? 0) > 0;
+        !hasGallery || (item.moreImages?.filter(Boolean).length ?? 0) > 0 || viewMode === "platform";
 
       return (
         matchesSearch &&
@@ -241,18 +259,20 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
       if (sortBy === "price-desc")
         return parsePrice(b.price) - parsePrice(a.price);
 
-      // Default: Newest first (client-side sort to avoid Firestore index)
       const getTime = (val: any) => {
         if (!val) return 0;
         if (typeof val === "number") return val;
         if (val.seconds) return val.seconds * 1000;
+        if (val.toMillis) return val.toMillis();
         return new Date(val).getTime() || 0;
       };
 
-      return getTime(b.timestamp) - getTime(a.timestamp);
+      return getTime(b.timestamp || b.createdAt) - getTime(a.timestamp || a.createdAt);
     });
   }, [
     results,
+    sellerListings,
+    viewMode,
     searchTerm,
     selectedCategory,
     minPrice,
@@ -508,17 +528,63 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
             </p>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 pb-2">
+            <div className="flex bg-muted/40 p-1 rounded-2xl border border-border/60">
+              <button
+                onClick={() => setViewMode("platform")}
+                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  viewMode === "platform" 
+                    ? "bg-foreground text-background shadow-lg" 
+                    : "text-secondary hover:text-foreground"
+                }`}
+              >
+                Verified Sellers
+              </button>
+              <button
+                onClick={() => setViewMode("marketplace")}
+                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  viewMode === "marketplace" 
+                    ? "bg-foreground text-background shadow-lg" 
+                    : "text-secondary hover:text-foreground"
+                }`}
+              >
+                External Listings
+              </button>
+            </div>
+            <div className="h-10 w-px bg-border/60" />
             <div className="flex flex-col items-end gap-1.5">
               <span className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/40">
-                Total Found
+                Matches
               </span>
               <span className="text-lg font-black text-foreground">
                 {processedResults.length.toLocaleString()}
               </span>
             </div>
-            <div className="h-10 w-px bg-border/60" />
           </div>
+        </div>
+
+        {/* Mobile View Switcher */}
+        <div className="lg:hidden grid grid-cols-2 gap-2 mb-6">
+          <button
+            onClick={() => setViewMode("platform")}
+            className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+              viewMode === "platform" 
+                ? "bg-foreground text-background border-foreground shadow-lg" 
+                : "bg-background text-secondary border-border"
+            }`}
+          >
+            Verified Sellers ({sellerListings.length})
+          </button>
+          <button
+            onClick={() => setViewMode("marketplace")}
+            className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+              viewMode === "marketplace" 
+                ? "bg-foreground text-background border-foreground shadow-lg" 
+                : "bg-background text-secondary border-border"
+            }`}
+          >
+            External Marketplace ({results.length})
+          </button>
         </div>
 
         {/* Search & Tools - Top Level */}
@@ -680,45 +746,63 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-4 pt-12 border-t border-border/40">
+                  <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 pt-12 border-t border-border/40">
                     <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage((prev) => prev - 1)}
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center border border-border/60 hover:border-primary hover:text-primary disabled:opacity-30 transition-all active:scale-90"
+                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center border border-border/60 hover:border-primary hover:text-primary disabled:opacity-30 transition-all active:scale-90"
                     >
-                      <ChevronLeft size={20} />
+                      <ChevronLeft size={18} />
                     </button>
-                    <div className="flex items-center gap-3">
+                    
+                    <div className="flex items-center gap-1.5 sm:gap-3">
                       {Array.from({ length: totalPages }).map((_, i) => {
                         const pageNum = i + 1;
+                        
+                        // Proper Ellipsis Logic
+                        const isFirst = pageNum === 1;
+                        const isLast = pageNum === totalPages;
+                        const isCurrent = pageNum === currentPage;
+                        const isNearCurrent = Math.abs(currentPage - pageNum) <= 1;
+                        
+                        if (isFirst || isLast || isCurrent || isNearCurrent) {
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black transition-all border ${
+                                isCurrent
+                                  ? "bg-foreground text-background border-foreground shadow-xl shadow-foreground/10"
+                                  : "bg-background border-border/60 hover:border-primary text-secondary"
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        }
+                        
+                        // Render ellipsis
                         if (
-                          totalPages > 5 &&
-                          Math.abs(currentPage - pageNum) > 2 &&
-                          pageNum !== 1 &&
-                          pageNum !== totalPages
-                        )
-                          return null;
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            className={`w-14 h-14 rounded-2xl text-xs font-black transition-all border ${
-                              currentPage === pageNum
-                                ? "bg-foreground text-background border-foreground shadow-xl shadow-foreground/10"
-                                : "bg-background border-border/60 hover:border-primary text-secondary"
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
+                          (pageNum === 2 && currentPage > 3) ||
+                          (pageNum === totalPages - 1 && currentPage < totalPages - 2)
+                        ) {
+                          return (
+                            <span key={pageNum} className="w-6 sm:w-10 text-center text-secondary/40 font-black text-xs tracking-widest">
+                              ...
+                            </span>
+                          );
+                        }
+                        
+                        return null;
                       })}
                     </div>
+
                     <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage((prev) => prev + 1)}
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center border border-border/60 hover:border-primary hover:text-primary disabled:opacity-30 transition-all active:scale-90"
+                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center border border-border/60 hover:border-primary hover:text-primary disabled:opacity-30 transition-all active:scale-90"
                     >
-                      <ChevronRight size={20} />
+                      <ChevronRight size={18} />
                     </button>
                   </div>
                 )}

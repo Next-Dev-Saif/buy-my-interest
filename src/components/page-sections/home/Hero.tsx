@@ -18,18 +18,6 @@ export default function Hero() {
       <Container className="relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-14 lg:gap-20">
           <div className="flex-1 space-y-9 text-center lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-border/70 bg-background/50 backdrop-blur"
-            >
-              <div className="h-2 w-2 rounded-full bg-primary" />
-              <p className="text-[11px] font-bold tracking-[0.25em] uppercase text-secondary">
-                Deal Intelligence
-              </p>
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -49,8 +37,8 @@ export default function Hero() {
               transition={{ delay: 0.2 }}
               className="text-xl text-secondary max-w-xl mx-auto lg:mx-0 leading-relaxed font-semibold"
             >
-              Set your criteria once. Our search agents monitor hundreds of sources
-              and surface the best matches before they get buried.
+              Set your criteria once. Our search agents monitor hundreds of
+              sources and surface the best matches before they get buried.
             </motion.p>
 
             <motion.div
@@ -82,8 +70,13 @@ export default function Hero() {
                 { value: "12k+", label: "Users" },
                 { value: "2hr", label: "Cycle" },
               ].map((s) => (
-                <div key={s.label} className="glass rounded-[1.5rem] border border-border/70 px-4 py-5 text-center sm:text-left">
-                  <p className="text-xl sm:text-2xl font-black text-foreground">{s.value}</p>
+                <div
+                  key={s.label}
+                  className="glass rounded-[1.5rem] border border-border/70 px-4 py-5 text-center sm:text-left"
+                >
+                  <p className="text-xl sm:text-2xl font-black text-foreground">
+                    {s.value}
+                  </p>
                   <p className="text-[9px] font-bold text-secondary uppercase tracking-[0.15em] mt-1 truncate">
                     {s.label}
                   </p>
@@ -92,44 +85,46 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
             className="flex-1 w-full relative"
           >
-              <div className="relative z-10 rounded-[2.5rem] overflow-hidden border border-border/70 shadow-2xl">
-                  <Image 
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop" 
-                    alt="Market Intelligence Dashboard" 
-                    width={1000} 
-                    height={1000}
-                    className="w-full h-auto object-cover"
-                    priority
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="absolute top-8 -left-8 hidden xl:block"
-                  >
-                    <div className="glass px-4 py-3 rounded-2xl border border-border/70 shadow-2xl">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center text-primary">
-                          <Zap className="w-5 h-5" />
-                        </div>
-                        <div className="pr-3">
-                          <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em]">
-                            New Match
-                          </p>
-                          <p className="text-xs font-black text-foreground">Vintage Porsche 911</p>
-                        </div>
-                      </div>
+            <div className="relative z-10 rounded-[2.5rem] overflow-hidden border border-border/70 shadow-2xl">
+              <Image
+                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop"
+                alt="Market Intelligence Dashboard"
+                width={1000}
+                height={1000}
+                className="w-full h-auto object-cover"
+                priority
+              />
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="absolute top-8 -left-8 hidden xl:block"
+              >
+                <div className="glass px-4 py-3 rounded-2xl border border-border/70 shadow-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 flex items-center justify-center text-primary">
+                      <Zap className="w-5 h-5" />
                     </div>
-                  </motion.div>
-              </div>
-              
-              <div className="absolute -inset-10 bg-primary/20 blur-[130px] rounded-full pointer-events-none -z-10" />
+                    <div className="pr-3">
+                      <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em]">
+                        New Match
+                      </p>
+                      <p className="text-xs font-black text-foreground">
+                        Vintage Porsche 911
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            <div className="absolute -inset-10 bg-primary/20 blur-[130px] rounded-full pointer-events-none -z-10" />
           </motion.div>
         </div>
       </Container>

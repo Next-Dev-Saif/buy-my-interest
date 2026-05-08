@@ -4,7 +4,7 @@ import Container from "./Container";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-border bg-card/30 mt-auto">
+    <footer className="w-full border-t border-border bg-card/30 mt-auto pb-32 sm:pb-0">
       <Container className="py-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <Link href="/">
           <Logo className="w-10 h-10" />

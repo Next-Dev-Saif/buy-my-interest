@@ -1,4 +1,4 @@
-import { MapPin, Clock, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { MapPin, Clock, ChevronLeft, ChevronRight, Sparkles, CheckCircle2 } from "lucide-react";
 import { formatPrice } from "@/utils/price-utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,7 +15,8 @@ export interface InterestResult {
   sourceUrl: string;
   dateScraped: string;
   timestamp: any;
-  isNew?: boolean;
+  isPlatformVerified?: boolean;
+  currency?: string;
 }
 
 interface InterestCardProps {
@@ -27,7 +28,9 @@ export default function InterestCard({ data }: InterestCardProps) {
   const [imageError, setImageError] = useState(false);
   const images = [data.imageUrl, ...(data.moreImages || [])].filter(Boolean);
   
-  const formattedPrice = formatPrice(data.price);
+  const formattedPrice = data.isPlatformVerified && data.currency 
+    ? `${data.currency} ${data.price}`
+    : formatPrice(data.price);
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -106,10 +109,10 @@ export default function InterestCard({ data }: InterestCardProps) {
           <div className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-background/80 backdrop-blur-sm text-foreground shadow-sm border border-border/50">
             {data.category}
           </div>
-          {data.isNew && (
-            <div className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow-sm flex items-center gap-1.5">
-              <Sparkles size={10} />
-              New
+          {data.isPlatformVerified && (
+            <div className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-green-600 text-white shadow-lg shadow-green-500/20 flex items-center gap-1.5 border border-white/20 animate-in fade-in zoom-in duration-500">
+              <CheckCircle2 size={10} />
+              Platform Verified
             </div>
           )}
         </div>
@@ -123,10 +126,20 @@ export default function InterestCard({ data }: InterestCardProps) {
                 <Clock className="w-3 h-3" />
                 {data.dateScraped}
              </div>
-             <div className="flex items-center gap-1 text-[10px] font-semibold text-secondary">
+             {data.isPlatformVerified ? (
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-600 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                <CheckCircle2 className="w-3 h-3" />
+                Verified
+              </div>
+            ) : (
+              <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-wider">
+                Listing
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-[10px] font-semibold text-secondary">
                 <MapPin className="w-3 h-3" />
                 {data.location}
-             </div>
           </div>
           <h3 className="text-base font-bold leading-snug line-clamp-2 text-foreground group-hover:text-primary transition-colors">
             {data.title}
@@ -143,9 +156,9 @@ export default function InterestCard({ data }: InterestCardProps) {
         <div className="mt-auto pt-4 border-t border-border flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-secondary uppercase tracking-wider">
-              Price
+              {data.isPlatformVerified ? "Seller Price" : "Market Price"}
             </span>
-            <span className="text-lg font-bold text-foreground">
+            <span className={`text-lg font-black ${data.isPlatformVerified ? "text-green-600" : "text-foreground"}`}>
               {formattedPrice}
             </span>
           </div>
@@ -154,9 +167,13 @@ export default function InterestCard({ data }: InterestCardProps) {
             href={data.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-all active:scale-95 shadow-sm"
+            className={`inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-bold transition-all active:scale-95 shadow-sm ${
+              data.isPlatformVerified 
+                ? "bg-green-600 text-white hover:bg-green-700" 
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
+            }`}
           >
-            View Details
+            {data.isPlatformVerified ? "Contact Seller" : "View Details"}
           </a>
         </div>
       </div>

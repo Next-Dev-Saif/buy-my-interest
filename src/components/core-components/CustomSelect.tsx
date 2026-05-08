@@ -60,7 +60,7 @@ export default function CustomSelect({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full bg-background border border-border rounded-lg pl-4 pr-10 py-2.5 text-sm font-medium outline-none cursor-pointer flex items-center justify-between transition-all hover:border-primary/30 group/btn ${
+          className={`w-full bg-background border border-border rounded-lg pl-4 pr-10 py-4 text-sm font-medium outline-none cursor-pointer flex items-center justify-between transition-all hover:border-primary/30 group/btn ${
             isOpen ? "ring-2 ring-primary/10 border-primary/40" : ""
           } ${error ? "border-red-500 ring-red-500/10" : ""}`}
         >

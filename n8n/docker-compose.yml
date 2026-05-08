@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  n8n-sync:
+    build: .
+    volumes:
+      - ./workflows:/app/workflows
+      - ./backups:/app/backups
+    env_file:
+      - .env
+    restart: always

@@ -6,15 +6,19 @@ import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import WaveCanvas from "@/components/animations/WaveCanvas";
 
+import { useTheme } from "next-themes";
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { theme } = useTheme();
+  
   return (
-    <div className="min-h-screen w-full bg-[#050808] relative overflow-hidden flex flex-col">
+    <div className="min-h-screen w-full bg-background relative overflow-hidden flex flex-col transition-colors duration-500">
       {/* Canvas Waves */}
-      <WaveCanvas color="#00f2ff" opacity={0.3} />
+      <WaveCanvas color={theme === "dark" ? "#00f2ff" : "#0f766e"} opacity={theme === "dark" ? 0.3 : 0.15} />
 
       {/* Jumbo Decorative SVGs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">

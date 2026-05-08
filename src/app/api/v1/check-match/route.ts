@@ -27,8 +27,9 @@ export async function GET(request: Request) {
       );
     }
 
-    // 2. Generate resultId (same logic as update-matches)
-    const resultId = Buffer.from(sourceUrl)
+    // 2. Generate resultId (consistent with update-matches)
+    const uniqueKey = `${userEmail}_${sourceUrl}`;
+    const resultId = Buffer.from(uniqueKey)
       .toString("base64")
       .replace(/[/+=]/g, "_");
 
