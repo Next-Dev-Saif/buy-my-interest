@@ -32,8 +32,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (user) {
         const token = await user.getIdToken();
-        const profileCompleted = await checkProfileCompletion(user.email || "", user.uid);
-        await setAuthCookie(token, profileCompleted, user.email || undefined);
+        const profileData = await checkProfileCompletion(user.email || "", user.uid);
+        await setAuthCookie(
+          token, 
+          !!profileData?.completed, 
+          user.email || undefined,
+          profileData?.userType
+        );
       } else {
         await removeAuthCookie();
       }
