@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-08T10:58:43.979Z",
+  "updatedAt": "2026-05-11T07:13:46.381Z",
   "createdAt": "2026-04-30T06:58:19.586Z",
   "id": "oMeIZE2RZ0To91SC",
   "name": "Buy Sell Chaser - Local",
@@ -681,7 +681,7 @@
     },
     {
       "parameters": {
-        "jsCode": "function extractCleanBody(html) { if (!html) return ''; const bodyMatch = html.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/i); let body = bodyMatch ? bodyMatch[1] : html; body = body.replace(/<script[\\s\\S]*?<\\/script>/gi, ''); body = body.replace(/<style[\\s\\S]*?<\\/style>/gi, ''); body = body.replace(/<noscript[\\s\\S]*?<\\/noscript>/gi, ''); body = body.replace(/<svg[\\s\\S]*?<\\/svg>/gi, ''); body = body.replace(/<iframe[\\s\\S]*?<\\/iframe>/gi, ''); body = body.replace(/<!--[\\s\\S]*?-->/g, ''); body = body.replace(/\\s+/g, ' ').trim(); const MAX_CHARS = 108000; if (body.length > MAX_CHARS) body = body.slice(0, MAX_CHARS); return body; } const html = $json.content || ''; const bodyContent = extractCleanBody(html); return [{ json: { bodyContent } }];"
+        "jsCode": "function extractCleanBody(html) { if (!html) return ''; const bodyMatch = html.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/i); let body = bodyMatch ? bodyMatch[1] : html; body = body.replace(/<script[\\s\\S]*?<\\/script>/gi, ''); body = body.replace(/<style[\\s\\S]*?<\\/style>/gi, ''); body = body.replace(/<noscript[\\s\\S]*?<\\/noscript>/gi, ''); body = body.replace(/<svg[\\s\\S]*?<\\/svg>/gi, ''); body = body.replace(/<iframe[\\s\\S]*?<\\/iframe>/gi, ''); body = body.replace(/<!--[\\s\\S]*?-->/g, ''); body = body.replace(/\\s+/g, ' ').trim(); return body; } const CHUNK_SIZE = 12000; const html = $json.content || ''; const body = extractCleanBody(html); const blockSplitRegex = /(?=<(?:div|section|article|li|tr|ul|ol|table|main|aside|header|footer|p)[^>]*>)/gi; const parts = body.split(blockSplitRegex).filter(p => p.trim().length > 50); const chunks = []; let current = ''; for (const part of parts) { if ((current + part).length > CHUNK_SIZE) { if (current.trim()) chunks.push(current.trim()); current = part; } else { current += part; } } if (current.trim()) chunks.push(current.trim()); const cappedChunks = chunks.slice(0, 10); if (cappedChunks.length === 0) { return [{ json: { chunkIndex: 0, totalChunks: 1, bodyContent: body.slice(0, CHUNK_SIZE) } }]; } return cappedChunks.map((chunk, index) => ({ json: { chunkIndex: index, totalChunks: cappedChunks.length, bodyContent: chunk } }));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -703,8 +703,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        6176,
-        448
+        6336,
+        288
       ],
       "id": "ce128bfb-c285-4303-ab28-fe947a4ab548",
       "name": "Intelligence-Extractor1",
@@ -863,8 +863,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
       "typeVersion": 1,
       "position": [
-        6176,
-        640
+        6224,
+        432
       ],
       "id": "29f68236-c697-409d-842f-87ea8a7e1ab7",
       "name": "AI-Model1",
@@ -883,7 +883,7 @@
       "typeVersion": 2,
       "position": [
         6464,
-        448
+        496
       ],
       "id": "4ba7428c-8bee-4214-9280-3af0435e0b01",
       "name": "JSON VERIFIER1"
@@ -910,7 +910,7 @@
             },
             {
               "name": "matches",
-              "value": "={{ $json.details[0].output.items }}"
+              "value": "={{ $json.mergedItems }}"
             }
           ]
         },
@@ -919,11 +919,37 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6672,
-        448
+        6704,
+        704
       ],
       "id": "64bc6dff-2c07-45f8-a887-78ad3e183276",
       "name": "Push-To-Website1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        6160,
+        192
+      ],
+      "id": "loop-over-chunks-id",
+      "name": "Loop Over Chunks"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seen = new Set(); const merged = []; for (const item of $input.all()) { const details = item.json?.details || []; for (const detail of details) { if (!detail.isPassed) continue; const items = detail.output?.items || []; for (const entry of items) { const key = `${(entry.title || '').toLowerCase().trim()}|${entry.price}`; if (!seen.has(key)) { seen.add(key); merged.push(entry); } } } } return [{ json: { mergedItems: merged } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7200,
+        448
+      ],
+      "id": "merge-chunk-results-id",
+      "name": "Merge-Chunk-Results"
     }
   ],
   "connections": {
@@ -1318,7 +1344,7 @@
       "main": [
         [
           {
-            "node": "Intelligence-Extractor1",
+            "node": "Loop Over Chunks",
             "type": "main",
             "index": 0
           }
@@ -1351,7 +1377,7 @@
       "main": [
         [
           {
-            "node": "Push-To-Website1",
+            "node": "Loop Over Chunks",
             "type": "main",
             "index": 0
           }
@@ -1368,6 +1394,35 @@
           }
         ]
       ]
+    },
+    "Loop Over Chunks": {
+      "main": [
+        [
+          {
+            "node": "Merge-Chunk-Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Intelligence-Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge-Chunk-Results": {
+      "main": [
+        [
+          {
+            "node": "Push-To-Website1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1379,9 +1434,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "6ddc6927-b058-43e8-a2a3-22ebfa12e6e0",
+  "versionId": "12c2eceb-fa25-4f0e-aaf1-4e1bf639e7d3",
   "activeVersionId": null,
-  "versionCounter": 115,
+  "versionCounter": 128,
   "triggerCount": 0,
   "shared": [
     {

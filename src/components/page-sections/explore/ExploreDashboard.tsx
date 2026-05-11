@@ -37,7 +37,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
 
   const [results, setResults] = useState<InterestResult[]>([]);
   const [sellerListings, setSellerListings] = useState<any[]>([]);
-  const [viewMode, setViewMode] = useState<"marketplace" | "platform">("platform");
+  const [viewMode, setViewMode] = useState<"marketplace" | "platform">("marketplace");
   const [loading, setLoading] = useState(true);
 
   // Basic Filters
@@ -529,12 +529,29 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
           </div>
 
           <div className="flex items-center gap-6 pb-2">
-            <div className="flex bg-muted/40 p-1 rounded-2xl border border-border/60">
+            <div className="relative flex bg-muted/50 shadow-inner p-1 rounded-full border border-border/40 w-fit">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute inset-1 bg-primary rounded-full shadow-lg shadow-primary/20"
+                  initial={false}
+                  transition={{
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 35
+                  }}
+                  style={{
+                    width: "calc(50% - 4px)",
+                    left: viewMode === "platform" ? "4px" : "calc(50% + 0px)",
+                  }}
+                />
+              </AnimatePresence>
+              
               <button
                 onClick={() => setViewMode("platform")}
-                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`relative z-10 px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors duration-300 ${
                   viewMode === "platform" 
-                    ? "bg-foreground text-background shadow-lg" 
+                    ? "text-primary-foreground" 
                     : "text-secondary hover:text-foreground"
                 }`}
               >
@@ -542,9 +559,9 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
               </button>
               <button
                 onClick={() => setViewMode("marketplace")}
-                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`relative z-10 px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors duration-300 ${
                   viewMode === "marketplace" 
-                    ? "bg-foreground text-background shadow-lg" 
+                    ? "text-primary-foreground" 
                     : "text-secondary hover:text-foreground"
                 }`}
               >
@@ -564,27 +581,44 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         </div>
 
         {/* Mobile View Switcher */}
-        <div className="lg:hidden grid grid-cols-2 gap-2 mb-6">
-          <button
-            onClick={() => setViewMode("platform")}
-            className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-              viewMode === "platform" 
-                ? "bg-foreground text-background border-foreground shadow-lg" 
-                : "bg-background text-secondary border-border"
-            }`}
-          >
-            Verified Sellers ({sellerListings.length})
-          </button>
-          <button
-            onClick={() => setViewMode("marketplace")}
-            className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-              viewMode === "marketplace" 
-                ? "bg-foreground text-background border-foreground shadow-lg" 
-                : "bg-background text-secondary border-border"
-            }`}
-          >
-            External Marketplace ({results.length})
-          </button>
+        <div className="lg:hidden flex items-center justify-center mb-8">
+          <div className="relative flex bg-muted/50 shadow-inner p-1 rounded-full border border-border/40 w-full max-w-[340px]">
+            <motion.div
+              layoutId="activeTabMobile"
+              className="absolute inset-1 bg-primary rounded-full shadow-lg shadow-primary/20"
+              initial={false}
+              transition={{
+                type: "spring",
+                stiffness: 500,
+                damping: 35
+              }}
+              style={{
+                width: "calc(50% - 4px)",
+                left: viewMode === "platform" ? "4px" : "calc(50%)",
+              }}
+            />
+
+            <button
+              onClick={() => setViewMode("platform")}
+              className={`relative z-10 flex-1 py-3.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-colors duration-300 ${
+                viewMode === "platform" 
+                  ? "text-primary-foreground" 
+                  : "text-secondary"
+              }`}
+            >
+              Verified ({sellerListings.length})
+            </button>
+            <button
+              onClick={() => setViewMode("marketplace")}
+              className={`relative z-10 flex-1 py-3.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-colors duration-300 ${
+                viewMode === "marketplace" 
+                  ? "text-primary-foreground" 
+                  : "text-secondary"
+              }`}
+            >
+              External ({results.length})
+            </button>
+          </div>
         </div>
 
         {/* Search & Tools - Top Level */}
