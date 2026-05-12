@@ -69,8 +69,8 @@ export const Logo = ({ className = "w-10 h-10", textColor = "text-foreground", s
       </div>
 
       {showText && (
-        <div className="flex flex-col">
-          <span className={`font-black text-2xl lg:text-3xl tracking-tighter leading-none ${textColor}`}>
+        <div className="hidden sm:flex flex-col">
+          <span className={`font-black text-xl lg:text-3xl tracking-tighter leading-none ${textColor}`}>
             BUYMY<span className="text-primary">INTERESTS</span>
           </span>
           <span className="text-[10px] font-bold text-secondary uppercase tracking-[0.4em] mt-0.5 opacity-60">

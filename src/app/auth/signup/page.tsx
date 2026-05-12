@@ -31,8 +31,8 @@ export default function SignupPage() {
       await updateProfile(userCredential.user, { displayName: name });
       const token = await userCredential.user.getIdToken();
       
-      // For a new signup, profile is always false initially
-      await setAuthCookie(token, false, email);
+      // For a new signup, profile is always false initially and userRole is not set yet
+      await setAuthCookie(token, false, email, undefined);
       
       router.push("/get-started");
     } catch (err: any) {
