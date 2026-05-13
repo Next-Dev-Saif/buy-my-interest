@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CustomSelect from "@/components/core-components/CustomSelect";
+import type { LucideIcon } from "lucide-react";
 
 interface ExploreDashboardProps {
   email: string;
@@ -30,6 +31,29 @@ const ITEMS_PER_PAGE = 8;
 
 type FilterKey = "price" | "location" | "sort" | "signals";
 
+const Chip = ({
+  label,
+  onClear,
+  icon: Icon,
+}: {
+  label: string;
+  onClear: () => void;
+  icon?: LucideIcon;
+}) => (
+  <button
+    onClick={onClear}
+    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/50 border border-border/60 hover:border-primary/50 hover:bg-primary/5 transition-all group"
+  >
+    {Icon && (
+      <Icon className="w-3 h-3 text-secondary group-hover:text-primary transition-colors" />
+    )}
+    <span className="text-[10px] font-bold text-secondary group-hover:text-primary transition-colors">
+      {label}
+    </span>
+    <X className="w-3 h-3 text-secondary/40 group-hover:text-red-500 transition-colors" />
+  </button>
+);
+
 export default function ExploreDashboard({ email }: ExploreDashboardProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -37,7 +61,9 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
 
   const [results, setResults] = useState<InterestResult[]>([]);
   const [sellerListings, setSellerListings] = useState<any[]>([]);
-  const [viewMode, setViewMode] = useState<"marketplace" | "platform">("marketplace");
+  const [viewMode, setViewMode] = useState<"marketplace" | "platform">(
+    "marketplace",
+  );
   const [loading, setLoading] = useState(true);
 
   // Basic Filters
@@ -106,7 +132,13 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
           data.push({
             id: doc.id,
             ...docData,
-            dateScraped: docData.dateScraped || (docData.timestamp ? new Date(docData.timestamp.seconds * 1000).toLocaleDateString() : new Date().toLocaleDateString()),
+            dateScraped:
+              docData.dateScraped ||
+              (docData.timestamp
+                ? new Date(
+                    docData.timestamp.seconds * 1000,
+                  ).toLocaleDateString()
+                : new Date().toLocaleDateString()),
           } as InterestResult);
         });
         setResults(data);
@@ -114,23 +146,24 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         // 2. Fetch platform seller listings
         const qPlatform = query(
           collection(db, "seller_listings"),
-          where("status", "==", "Active")
+          where("status", "==", "Active"),
         );
         const platformSnapshot = await getDocs(qPlatform);
-        const pData = platformSnapshot.docs.map(doc => {
+        const pData = platformSnapshot.docs.map((doc) => {
           const item = doc.data();
           return {
             id: doc.id,
             ...item,
             imageUrl: item.image || "",
-            dateScraped: item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : new Date().toLocaleDateString(),
+            dateScraped: item.createdAt
+              ? new Date(item.createdAt.seconds * 1000).toLocaleDateString()
+              : new Date().toLocaleDateString(),
             sourceUrl: `mailto:${item.userId}`, // Contact the seller directly
             isPlatformVerified: true,
-            timestamp: item.createdAt
+            timestamp: item.createdAt,
           };
         });
         setSellerListings(pData);
-
       } catch (error) {
         console.error("Error fetching results", error);
       } finally {
@@ -220,7 +253,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
 
   const processedResults = useMemo(() => {
     const currentData = viewMode === "marketplace" ? results : sellerListings;
-    
+
     let filtered = currentData.filter((item) => {
       const matchesSearch =
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -240,7 +273,9 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
       const matchesNew = !onlyNew || Boolean(item.isNew);
 
       const matchesGallery =
-        !hasGallery || (item.moreImages?.filter(Boolean).length ?? 0) > 0 || viewMode === "platform";
+        !hasGallery ||
+        (item.moreImages?.filter(Boolean).length ?? 0) > 0 ||
+        viewMode === "platform";
 
       return (
         matchesSearch &&
@@ -267,7 +302,10 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         return new Date(val).getTime() || 0;
       };
 
-      return getTime(b.timestamp || b.createdAt) - getTime(a.timestamp || a.createdAt);
+      return (
+        getTime(b.timestamp || b.createdAt) -
+        getTime(a.timestamp || a.createdAt)
+      );
     });
   }, [
     results,
@@ -487,7 +525,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         <div className="pt-6 flex flex-col gap-3">
           <button
             onClick={() => setShowFilters(false)}
-            className="w-full py-4 rounded-2xl bg-foreground text-background text-[11px] font-black uppercase tracking-[0.1em] hover:opacity-90 transition-all shadow-xl shadow-foreground/10"
+            className="w-full py-4 rounded-2xl bg-primary text-primary-foreground text-[11px] font-black uppercase tracking-[0.1em] hover:opacity-90 transition-all shadow-xl shadow-primary/10"
           >
             Apply Selection
           </button>
@@ -502,132 +540,89 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
     </div>
   );
 
+  // Main Return
   return (
-    <div className="flex flex-col gap-12">
-      {/* Mobile-Only App Header */}
-      <div className="lg:hidden space-y-4">
-        <h1 className="text-3xl font-black tracking-tight text-foreground font-editorial">
-          Discovery.
-        </h1>
-        <p className="text-sm text-secondary font-medium leading-relaxed">
-          Results for <span className="text-foreground font-bold">{email}</span>
-        </p>
-      </div>
-
-      <div className="">
-        {/* Page Header - Desktop Only */}
-        <div className="hidden lg:flex flex-row gap-8 items-end justify-between border-b border-border/60 pb-3">
-          <div className="space-y-4">
-            <h1 className="text-6xl font-black tracking-tight text-foreground font-editorial">
-              Explore Results.
+    <div className="flex flex-col gap-0">
+      {/* Header Section - Modernized & Responsive */}
+      <div className="relative">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-card border border-border shadow-sm p-6 md:py-6 md:px-8 rounded-[2rem] md:rounded-3xl">
+          <div className="space-y-2 md:space-y-3 ">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-[9px] md:text-[10px] font-bold text-secondary uppercase tracking-wider">
+              Marketplace Explorer
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+              Discovery <span className="text-primary">Results</span>
             </h1>
-            <p className="text-base text-secondary font-medium max-w-xl leading-relaxed">
-              Marketplace opportunities identified for{" "}
-              <span className="text-foreground font-bold">{email}</span>. Use
-              the criteria below to refine your view.
+            <p className="text-secondary text-sm md:text-sm font-medium max-w-xl leading-relaxed">
+              Identifying global opportunities for{" "}
+              <span className="text-foreground font-bold">{email}</span>. Refine
+              your search parameters to pinpoint specific matches.
             </p>
           </div>
 
-          <div className="flex items-center gap-6 pb-2">
-            <div className="relative flex bg-muted/50 shadow-inner p-1 rounded-full border border-border/40 w-fit">
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="relative flex bg-muted/50 shadow-inner p-1 rounded-full border border-border/40 w-full sm:w-fit">
               <AnimatePresence mode="wait">
                 <motion.div
-                  layoutId="activeTab"
+                  layoutId="activeTabMode"
                   className="absolute inset-1 bg-primary rounded-full shadow-lg shadow-primary/20"
                   initial={false}
                   transition={{
                     type: "spring",
                     stiffness: 500,
-                    damping: 35
+                    damping: 35,
                   }}
                   style={{
                     width: "calc(50% - 4px)",
-                    left: viewMode === "platform" ? "4px" : "calc(50% + 0px)",
+                    left: viewMode === "platform" ? "4px" : "calc(50%)",
                   }}
                 />
               </AnimatePresence>
-              
+
               <button
                 onClick={() => setViewMode("platform")}
-                className={`relative z-10 px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors duration-300 ${
-                  viewMode === "platform" 
-                    ? "text-primary-foreground" 
+                className={`relative z-10 flex-1 sm:flex-none px-6 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${
+                  viewMode === "platform"
+                    ? "text-primary-foreground"
                     : "text-secondary hover:text-foreground"
                 }`}
               >
-                Verified Sellers
+                Verified ({sellerListings.length})
               </button>
               <button
                 onClick={() => setViewMode("marketplace")}
-                className={`relative z-10 px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors duration-300 ${
-                  viewMode === "marketplace" 
-                    ? "text-primary-foreground" 
+                className={`relative z-10 flex-1 sm:flex-none px-6 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${
+                  viewMode === "marketplace"
+                    ? "text-primary-foreground"
                     : "text-secondary hover:text-foreground"
                 }`}
               >
-                External Listings
+                External ({results.length})
               </button>
             </div>
-            <div className="h-10 w-px bg-border/60" />
-            <div className="flex flex-col items-end gap-1.5">
-              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/40">
+
+            <div className="hidden lg:block h-10 w-px bg-border/60" />
+
+            <div className="hidden lg:flex flex-col items-end gap-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-secondary/40">
                 Matches
               </span>
-              <span className="text-lg font-black text-foreground">
+              <span className="text-xl font-bold text-foreground">
                 {processedResults.length.toLocaleString()}
               </span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Mobile View Switcher */}
-        <div className="lg:hidden flex items-center justify-center mb-8">
-          <div className="relative flex bg-muted/50 shadow-inner p-1 rounded-full border border-border/40 w-full max-w-[340px]">
-            <motion.div
-              layoutId="activeTabMobile"
-              className="absolute inset-1 bg-primary rounded-full shadow-lg shadow-primary/20"
-              initial={false}
-              transition={{
-                type: "spring",
-                stiffness: 500,
-                damping: 35
-              }}
-              style={{
-                width: "calc(50% - 4px)",
-                left: viewMode === "platform" ? "4px" : "calc(50%)",
-              }}
-            />
-
-            <button
-              onClick={() => setViewMode("platform")}
-              className={`relative z-10 flex-1 py-3.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-colors duration-300 ${
-                viewMode === "platform" 
-                  ? "text-primary-foreground" 
-                  : "text-secondary"
-              }`}
-            >
-              Verified ({sellerListings.length})
-            </button>
-            <button
-              onClick={() => setViewMode("marketplace")}
-              className={`relative z-10 flex-1 py-3.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-colors duration-300 ${
-                viewMode === "marketplace" 
-                  ? "text-primary-foreground" 
-                  : "text-secondary"
-              }`}
-            >
-              External ({results.length})
-            </button>
-          </div>
-        </div>
-
+      <div className="flex flex-col gap-8 md:gap-10">
         {/* Search & Tools - Top Level */}
-        <div className="sticky top-20 lg:relative z-40 -mx-5 sm:mx-0 px-5 sm:px-0 py-4 lg:py-0 bg-background lg:bg-transparent border-b lg:border-none border-border/40 lg:shadow-none transition-all lg:mb-10">
-          <div className="flex flex-col gap-4">
+        <div className="sticky top-20 lg:relative z-40 -mx-5 sm:mx-0 px-5 sm:px-0 py-4 lg:py-0 bg-background lg:bg-transparent border-b lg:border-none border-border/40 lg:shadow-none transition-all lg:mb-[5rem]">
+          <div className="flex flex-col ">
             <div className="flex items-center mb-5  gap-3">
-              <div className="relative flex-grow group/search">
+              <div className="relative flex-grow  group/search">
                 <div className="absolute inset-0 bg-primary/5 rounded-2xl lg:rounded-[2.5rem] blur-2xl opacity-0 group-focus-within/search:opacity-100 transition-opacity" />
-                <div className="relative glass p-1.5 lg:p-1 rounded-2xl lg:rounded-[2.5rem] border border-border/60 shadow-lg shadow-black/[0.01]">
+                <div className="relative glass p-1.5 lg:p-1  rounded-2xl lg:rounded-[2.5rem] border border-border/60 shadow-lg shadow-black/[0.01]">
                   <div className="relative flex items-center">
                     <Search className="absolute left-5 lg:left-7 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-secondary/30 group-focus-within/search:text-primary transition-colors" />
                     <input
@@ -642,7 +637,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
               </div>
               <button
                 onClick={() => setShowFilters(true)}
-                className="lg:hidden flex items-center justify-center w-12 h-12 rounded-2xl bg-foreground text-background transition-all hover:opacity-90 active:scale-90 shadow-lg shadow-foreground/10 flex-shrink-0"
+                className="lg:hidden flex items-center justify-center w-12 h-12 rounded-2xl bg-primary text-primary-foreground transition-all hover:opacity-90 active:scale-90 shadow-lg shadow-primary/10 flex-shrink-0"
               >
                 <SlidersHorizontal className="w-5 h-5" />
               </button>
@@ -788,17 +783,18 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
                     >
                       <ChevronLeft size={18} />
                     </button>
-                    
+
                     <div className="flex items-center gap-1.5 sm:gap-3">
                       {Array.from({ length: totalPages }).map((_, i) => {
                         const pageNum = i + 1;
-                        
+
                         // Proper Ellipsis Logic
                         const isFirst = pageNum === 1;
                         const isLast = pageNum === totalPages;
                         const isCurrent = pageNum === currentPage;
-                        const isNearCurrent = Math.abs(currentPage - pageNum) <= 1;
-                        
+                        const isNearCurrent =
+                          Math.abs(currentPage - pageNum) <= 1;
+
                         if (isFirst || isLast || isCurrent || isNearCurrent) {
                           return (
                             <button
@@ -814,19 +810,23 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
                             </button>
                           );
                         }
-                        
+
                         // Render ellipsis
                         if (
                           (pageNum === 2 && currentPage > 3) ||
-                          (pageNum === totalPages - 1 && currentPage < totalPages - 2)
+                          (pageNum === totalPages - 1 &&
+                            currentPage < totalPages - 2)
                         ) {
                           return (
-                            <span key={pageNum} className="w-6 sm:w-10 text-center text-secondary/40 font-black text-xs tracking-widest">
+                            <span
+                              key={pageNum}
+                              className="w-6 sm:w-10 text-center text-secondary/40 font-black text-xs tracking-widest"
+                            >
                               ...
                             </span>
                           );
                         }
-                        
+
                         return null;
                       })}
                     </div>
@@ -891,28 +891,5 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-function Chip({
-  label,
-  onClear,
-  icon: Icon,
-}: {
-  label: string;
-  onClear: () => void;
-  icon?: any;
-}) {
-  return (
-    <button
-      onClick={onClear}
-      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-background border border-border hover:border-primary/30 text-[10px] font-bold text-secondary hover:text-foreground transition-all group"
-    >
-      {Icon && (
-        <Icon className="w-3 h-3 text-primary opacity-70 group-hover:opacity-100" />
-      )}
-      <span className="max-w-[150px] truncate">{label}</span>
-      <X className="w-3 h-3 text-secondary/40 group-hover:text-foreground transition-colors" />
-    </button>
   );
 }

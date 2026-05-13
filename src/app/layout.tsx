@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fraunces.variable} ${poppins.variable} antialiased`} suppressHydrationWarning>
       <body className="font-poppins min-h-screen flex flex-col bg-background text-foreground">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <AuthProvider>
             {children}
           </AuthProvider>

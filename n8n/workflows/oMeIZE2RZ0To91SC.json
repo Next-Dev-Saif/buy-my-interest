@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-11T07:13:46.381Z",
+  "updatedAt": "2026-05-13T11:01:29.951Z",
   "createdAt": "2026-04-30T06:58:19.586Z",
   "id": "oMeIZE2RZ0To91SC",
   "name": "Buy Sell Chaser - Local",
@@ -77,7 +77,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        2720,
+        2704,
         -224
       ],
       "id": "4e423c03-9224-4a02-91a6-c3079d3d2500",
@@ -273,8 +273,8 @@
         "rule": {
           "interval": [
             {
-              "field": "minutes",
-              "minutesInterval": 15
+              "field": "hours",
+              "hoursInterval": 12
             }
           ]
         }
@@ -286,14 +286,15 @@
         -416
       ],
       "id": "eb60f6ac-4c65-4bf4-9918-5e58966291b2",
-      "name": "Trigger-Premium-15m1"
+      "name": "Trigger-Premium-12h"
     },
     {
       "parameters": {
         "rule": {
           "interval": [
             {
-              "field": "hours"
+              "field": "hours",
+              "hoursInterval": 5
             }
           ]
         }
@@ -305,7 +306,7 @@
         -224
       ],
       "id": "94c4ccf3-eb80-4014-86fb-64f282457450",
-      "name": "Trigger-Priority-1h1"
+      "name": "Trigger-Ultra-5h"
     },
     {
       "parameters": {
@@ -313,7 +314,7 @@
           "interval": [
             {
               "field": "hours",
-              "hoursInterval": 4
+              "hoursInterval": 24
             }
           ]
         }
@@ -325,7 +326,7 @@
         -16
       ],
       "id": "4c20848e-9563-49ec-8517-1e30fd505947",
-      "name": "Trigger-Free-4h1"
+      "name": "Trigger-Free-24h"
     },
     {
       "parameters": {
@@ -1423,6 +1424,39 @@
           }
         ]
       ]
+    },
+    "Trigger-Premium-12h": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Premium1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger-Ultra-5h": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Priority1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger-Free-24h": {
+      "main": [
+        [
+          {
+            "node": "Fetch-Free1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1434,9 +1468,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "12c2eceb-fa25-4f0e-aaf1-4e1bf639e7d3",
+  "versionId": "887f6e53-e7a3-462b-bf8a-21c2106243cc",
   "activeVersionId": null,
-  "versionCounter": 128,
+  "versionCounter": 133,
   "triggerCount": 0,
   "shared": [
     {

@@ -62,7 +62,7 @@ export default function Categories() {
           </Link>
         </div>
 
-        <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto sm:overflow-visible no-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0 pb-8 sm:pb-0">
+        <div className="flex sm:grid sm:grid-cols-2 xl:grid-cols-4 gap-8 overflow-x-auto sm:overflow-visible no-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0 pb-8 sm:pb-0">
           {categories.map((cat, i) => (
             <motion.div
               key={i}
@@ -70,14 +70,14 @@ export default function Categories() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group relative min-w-[280px] sm:min-w-0 h-[420px] sm:h-[450px] rounded-[2.5rem] overflow-hidden border border-border/70 glass shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 flex-shrink-0"
+              className="group relative min-w-[240px] max-w-[280px] sm:max-w-none sm:min-w-0 h-[360px] sm:h-[450px] rounded-[2.5rem] overflow-hidden border border-border/70 glass shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 flex-shrink-0"
             >
               <div
                 className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${cat.color} opacity-0 group-hover:opacity-100 transition-opacity`}
               />
 
-              <div className="p-8 sm:p-10 h-full flex flex-col justify-between relative z-10">
-                <div className="space-y-5 sm:space-y-6">
+              <div className="p-6 sm:p-10 h-full flex flex-col justify-between relative z-10">
+                <div className="space-y-4 sm:space-y-6">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                     <cat.icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
                   </div>
@@ -89,7 +89,7 @@ export default function Categories() {
                   </p>
                 </div>
 
-                <div className="space-y-5 sm:space-y-6 pt-5 sm:pt-6 border-t border-border">
+                <div className="space-y-4 sm:space-y-6 pt-4 sm:pt-6 border-t border-border">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">
                       Active

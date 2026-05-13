@@ -1,11 +1,17 @@
-# Implementation Tasks: Redesign Explore Dashboard Toggler
+# Seller Dashboard Redesign Tasks
 
 ## Completed
-- [x] Analyze current implementation of the toggler in `ExploreDashboard.tsx`.
-- [x] Set "External Listings" as default view mode.
-- [x] Redesign the toggler to a "circular design" (premium, professional).
-- [x] Add global `cursor: pointer` behavior for buttons, links, and interactive elements in `globals.css`.
+- [x] Initial analysis of `SellerDashboard.tsx`
+- [x] Defined redesign goals and premium aesthetics plan
+- [x] Implementing Full CRUD (Create, Read, Update, Delete)
+- [x] Redesigning UI components for premium look and feel
+- [x] Add listing form enhancement (Multi-step or more interactive)
+- [x] Image upload simulation/logic
+- [x] Status management for listings
+- [x] Final quality check and accessibility audit
 
 ## In Progress
-- [ ] Verify changes in desktop and mobile views.
-- [ ] Ensure consistency with the overall design system.
+- [ ] None
+
+## Pending
+- [ ] None

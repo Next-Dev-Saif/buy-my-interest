@@ -5,9 +5,10 @@ import React, { useEffect, useRef } from "react";
 interface WaveCanvasProps {
   color?: string;
   opacity?: number;
+  speedMultiplier?: number;
 }
 
-export default function WaveCanvas({ color = "#00f2ff", opacity = 0.15 }: WaveCanvasProps) {
+export default function WaveCanvas({ color = "#00f2ff", opacity = 0.15, speedMultiplier = 1 }: WaveCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function WaveCanvas({ color = "#00f2ff", opacity = 0.15 }: WaveCa
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      time += 0.005;
+      time += 0.005 * speedMultiplier;
 
       const drawWave = (side: "left" | "right", waveOpacity: number) => {
         ctx.save();
@@ -69,27 +70,26 @@ export default function WaveCanvas({ color = "#00f2ff", opacity = 0.15 }: WaveCa
         ctx.restore();
       };
 
-      drawWave("left", opacity);
-      drawWave("right", opacity * 0.8);
+    drawWave("left", opacity * 1.5);
+    drawWave("right", opacity * 1.2);
 
-      animationFrameId = requestAnimationFrame(draw);
-    };
+    animationFrameId = requestAnimationFrame(draw);
+  };
 
-    window.addEventListener("resize", resize);
-    resize();
-    draw();
+  window.addEventListener("resize", resize);
+  resize();
+  draw();
 
-    return () => {
-      window.removeEventListener("resize", resize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [color, opacity]);
+  return () => {
+    window.removeEventListener("resize", resize);
+    cancelAnimationFrame(animationFrameId);
+  };
+}, [color, opacity, speedMultiplier]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-0"
-      style={{ filter: "blur(2px)" }}
-    />
-  );
+return (
+  <canvas
+    ref={canvasRef}
+    className="absolute inset-0 w-full h-full pointer-events-none z-0"
+  />
+);
 }

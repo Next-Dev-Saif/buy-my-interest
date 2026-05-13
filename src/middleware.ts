@@ -9,9 +9,17 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Protected routes
-  const protectedRoutes = ['/get-started', '/explore-interests', '/profile', '/checkout', '/seller'];
+  const protectedRoutes = ['/get-started', '/explore-interests', '/profile', '/checkout', '/seller', '/agent'];
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   const isAuthRoute = ['/auth/login', '/auth/signup'].some(route => pathname.startsWith(route));
+
+  // 0. Locked Routes (Coming Soon)
+  const lockedRoutes = ['/agent', '/checkout'];
+  const isLockedRoute = lockedRoutes.some(route => pathname.startsWith(route));
+  
+  if (isLockedRoute && !pathname.startsWith('/coming-soon')) {
+    return NextResponse.redirect(new URL('/coming-soon', request.url));
+  }
 
   // 1. If accessing a protected route without a token, redirect to login
   if (isProtectedRoute && !authToken) {
@@ -57,5 +65,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/get-started/:path*', '/explore-interests/:path*', '/profile/:path*', '/checkout/:path*', '/seller/:path*', '/auth/login', '/auth/signup'],
+  matcher: ['/get-started/:path*', '/explore-interests/:path*', '/profile/:path*', '/checkout/:path*', '/seller/:path*', '/agent/:path*', '/auth/login', '/auth/signup'],
 };

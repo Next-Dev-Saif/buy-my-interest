@@ -40,6 +40,7 @@ export default function Navbar() {
       name: "Explore", 
       href: user?.email ? `/explore-interests/${user.email}` : "/explore-interests/guest" 
     },
+    { name: "Agent", href: "/agent" },
     { name: "Pricing", href: "/#pricing" },
   ];
 
