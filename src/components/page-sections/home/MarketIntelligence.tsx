@@ -22,9 +22,9 @@ export default function MarketIntelligence() {
               <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-primary">
                 Market Core
               </p>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground font-editorial tracking-tight leading-[1.1]">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight leading-[1.1]">
                 Global coverage. <br />
-                <span className="text-secondary/40 italic">Local precision.</span>
+                <span className="text-secondary/60 italic">Local precision.</span>
               </h2>
             </div>
             
@@ -62,7 +62,7 @@ export default function MarketIntelligence() {
               <motion.div 
                 initial={{ x: 20, opacity: 0 }}
                 whileInView={{ x: 0, opacity: 1 }}
-                className="absolute bottom-8 right-8 left-8 glass p-6 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-xl"
+                className="absolute bottom-8 right-8 left-8 bg-card/95 p-6 rounded-xl border border-border shadow-md backdrop-blur-md"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -83,10 +83,7 @@ export default function MarketIntelligence() {
                 </div>
               </motion.div>
             </div>
-            
-            {/* Background decorative element */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl -z-10" />
-            <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-muted rounded-full blur-3xl -z-10" />
+
           </div>
         </div>
       </Container>

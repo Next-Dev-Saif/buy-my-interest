@@ -38,8 +38,7 @@ export default function Hero() {
     <section className="relative min-h-[90vh] flex items-center pt-24 pb-32 overflow-hidden bg-background">
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[800px] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute top-0 right-0 h-[500px] w-[500px] rounded-full bg-accent/30 blur-[100px] opacity-50" />
+        <div className="absolute top-0 right-0 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent" />
       </div>
 
       {/* Floating Images Layer */}
@@ -133,12 +132,12 @@ export default function Hero() {
           >
             <Link
               href="/get-started"
-              className="group w-full sm:w-auto px-10 py-5 rounded-2xl bg-foreground text-background font-black text-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 shadow-2xl shadow-foreground/10"
+              className="group w-full sm:w-auto px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-base hover:-translate-y-1 active:translate-y-0 transition-transform duration-150 flex items-center justify-center gap-3 shadow-md"
             >
               Start Free Discovery{" "}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <button className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-border bg-background/50 text-foreground font-bold text-lg hover:bg-muted/40 transition-all flex items-center justify-center gap-3 backdrop-blur group">
+            <button className="w-full sm:w-auto px-8 py-4 rounded-xl border border-border bg-background text-foreground font-semibold text-base hover:bg-muted transition-colors duration-150 flex items-center justify-center gap-3 group">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <PlayCircle className="w-5 h-5 text-primary" />
               </div>

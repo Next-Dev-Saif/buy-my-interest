@@ -46,7 +46,7 @@ export default function Categories() {
             <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-secondary">
               Verticals
             </p>
-            <h2 className="text-4xl lg:text-5xl font-black text-foreground font-editorial tracking-tight">
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight">
               Tuned for high-value categories.
             </h2>
             <p className="text-lg text-secondary font-semibold leading-relaxed">
@@ -55,7 +55,7 @@ export default function Categories() {
           </div>
           <Link
             href="/get-started"
-            className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/20 transition-all active:scale-95"
+            className="group flex items-center gap-3 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:-translate-y-1 hover:shadow-md transition-all active:translate-y-0"
           >
             Explore All Categories{" "}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -81,7 +81,7 @@ export default function Categories() {
                   <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                     <cat.icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-primary transition-colors font-editorial tracking-tight">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">
                     {cat.title}
                   </h3>
                   <p className="text-secondary font-medium text-xs sm:text-sm leading-relaxed line-clamp-4">

@@ -34,7 +34,7 @@ export default function Process() {
           <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-secondary">
             How It Works
           </p>
-          <h2 className="text-4xl lg:text-5xl font-black text-foreground font-editorial tracking-tight">
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight">
             Three steps. No noise.
           </h2>
           <p className="text-lg text-secondary font-semibold leading-relaxed">
@@ -54,15 +54,15 @@ export default function Process() {
               transition={{ delay: i * 0.1 }}
               className="relative group flex flex-col items-center md:items-start text-center md:text-left"
             >
-              <div className="mb-10 text-7xl sm:text-8xl font-black text-foreground/[0.04] absolute -top-10 sm:-top-12 md:-left-4 group-hover:text-primary/[0.08] transition-colors select-none">
+              <div className="mb-10 text-7xl sm:text-8xl font-bold text-foreground/[0.04] absolute -top-10 sm:-top-12 md:-left-4 group-hover:text-primary/[0.08] transition-colors select-none">
                 {item.step}
               </div>
               
-              <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center relative z-10 mb-6 sm:mb-8 rounded-2xl sm:rounded-3xl glass border border-border/70 shadow-sm group-hover:border-primary/30 transition-colors">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center relative z-10 mb-6 sm:mb-8 rounded-xl bg-card border border-border shadow-sm group-hover:border-primary/30 transition-colors">
                 <item.icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
               </div>
               
-              <h3 className="text-xl sm:text-2xl font-black mb-3 sm:mb-4 text-foreground flex items-center gap-2 font-editorial tracking-tight">
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-foreground flex items-center gap-2 tracking-tight">
                 {item.title}
               </h3>
               <p className="text-secondary leading-relaxed font-semibold text-sm sm:text-base max-w-[280px] sm:max-w-none">{item.desc}</p>

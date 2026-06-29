@@ -39,15 +39,14 @@ export default function SellerAdvantage() {
               />
             </div>
             
-            {/* Overlay stats card */}
             <motion.div 
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
-              className="absolute -bottom-10 -right-4 md:right-10 glass p-8 rounded-3xl border border-border shadow-2xl max-w-xs"
+              className="absolute -bottom-10 -right-4 md:right-10 bg-card/95 p-8 rounded-xl border border-border shadow-md max-w-xs backdrop-blur-md"
             >
               <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-4 text-center">Avg. Listing Velocity</p>
               <div className="flex items-center justify-center gap-4">
-                <span className="text-4xl font-black text-foreground">12.4%</span>
+                <span className="text-4xl font-extrabold text-foreground">12.4%</span>
                 <div className="flex flex-col">
                   <span className="text-primary font-black text-sm flex items-center">
                     <ArrowUpRight className="w-4 h-4" /> 2.1%
@@ -63,7 +62,7 @@ export default function SellerAdvantage() {
               <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-secondary">
                 For Sellers
               </p>
-              <h2 className="text-4xl md:text-5xl font-black text-foreground font-editorial tracking-tight leading-[1.1]">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight leading-[1.1]">
                 Your bridge to <br />
                 <span className="text-primary">qualified demand.</span>
               </h2>
@@ -97,7 +96,7 @@ export default function SellerAdvantage() {
             <div className="pt-4 flex justify-center lg:justify-start">
               <Link 
                 href="/dashboard"
-                className="px-8 py-4 rounded-2xl bg-foreground text-background text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-foreground/10"
+                className="px-8 py-4 rounded-xl bg-foreground text-background text-sm font-semibold hover:-translate-y-1 active:translate-y-0 transition-transform duration-150 shadow-md"
               >
                 Become a Verified Seller
               </Link>

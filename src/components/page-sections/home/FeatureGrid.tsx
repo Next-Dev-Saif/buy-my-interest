@@ -20,7 +20,7 @@ export default function FeatureGrid() {
           <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-secondary">
             Capabilities
           </p>
-          <h2 className="text-4xl lg:text-5xl font-black text-foreground font-editorial tracking-tight">
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight">
             Quietly powerful.
           </h2>
           <p className="text-lg text-secondary font-semibold leading-relaxed">
@@ -39,7 +39,7 @@ export default function FeatureGrid() {
               <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-primary mx-auto sm:mx-0">
                 <Globe className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-foreground font-editorial tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
                 Broad coverage, precise intent.
               </h3>
               <p className="text-secondary leading-relaxed font-semibold text-sm sm:text-base">
@@ -77,7 +77,7 @@ export default function FeatureGrid() {
               <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-primary-foreground mx-auto sm:mx-0">
                 <Zap className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-black font-editorial tracking-tight">Real-time pulse.</h3>
+              <h3 className="text-xl sm:text-2xl font-bold tracking-tight">Real-time pulse.</h3>
               <p className="text-primary-foreground/80 font-semibold text-sm sm:text-base">
                 Matches are detected and delivered to your inbox within minutes
                 of being posted online.
@@ -102,7 +102,7 @@ export default function FeatureGrid() {
               <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-primary mx-auto sm:mx-0">
                 <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-foreground">
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                 Concierge Check
               </h3>
               <p className="text-secondary font-semibold text-sm sm:text-base">
@@ -133,7 +133,7 @@ export default function FeatureGrid() {
               <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-primary mx-auto sm:mx-0">
                 <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-foreground font-editorial tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
                 Built for decisions.
               </h3>
               <p className="text-secondary leading-relaxed font-semibold text-sm sm:text-base">
