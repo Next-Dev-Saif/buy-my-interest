@@ -48,7 +48,7 @@ export default function Navbar() {
     <header 
       className={`${
         isOpen ? "fixed inset-x-0 top-0 bg-background border-b border-border/60" : "sticky top-0 glass border-b border-border/40"
-      } z-[100] w-full transition-all duration-300`}
+      } z-[999] w-full transition-all duration-300`}
     >
       <Container className="h-20 flex items-center justify-between">
         <div className="flex-1 flex items-center">

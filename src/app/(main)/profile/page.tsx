@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { updateProfile } from "firebase/auth";
-import { auth } from "@/config/firebase";
+import { auth, db } from "@/config/firebase";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import {
   User,
   Mail,
@@ -22,6 +23,7 @@ import {
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { AgentAvatar } from "@/components/page-sections/agent/AgentAvatar";
 
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
@@ -30,6 +32,38 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [agentPermissionsEnabled, setAgentPermissionsEnabled] = useState(false);
+
+  // Load Agent Permissions
+  useEffect(() => {
+    async function fetchUserSettings() {
+      if (user?.uid) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setAgentPermissionsEnabled(!!userDoc.data().agentPermissionsEnabled);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user settings:", error);
+        }
+      }
+    }
+    fetchUserSettings();
+  }, [user]);
+
+  const toggleAgentPermissions = async () => {
+    if (!user?.uid) return;
+    const newValue = !agentPermissionsEnabled;
+    setAgentPermissionsEnabled(newValue);
+    try {
+      await setDoc(doc(db, "users", user.uid), {
+        agentPermissionsEnabled: newValue,
+      }, { merge: true });
+    } catch (error) {
+      console.error("Failed to update agent permissions:", error);
+      setAgentPermissionsEnabled(!newValue); // revert on failure
+    }
+  };
 
   // Notification State
   const [notifications, setNotifications] = useState({
@@ -293,6 +327,28 @@ export default function ProfilePage() {
                     <button className="w-full sm:w-auto px-6 py-3 rounded-xl border border-border bg-background hover:bg-muted font-semibold text-sm transition-colors">
                       Manage Security
                     </button>
+                  </div>
+
+                  <div className="bg-card rounded-3xl p-6 sm:p-12 border border-border shadow-sm flex flex-col md:flex-row items-center gap-6 sm:gap-8 mt-6">
+                    <div className="shrink-0 flex items-center justify-center">
+                      <AgentAvatar size="md" />
+                    </div>
+                    <div className="flex-1 space-y-2 text-center md:text-left">
+                      <h3 className="text-2xl font-bold">
+                        Discovery Agent Permissions
+                      </h3>
+                      <p className="text-secondary font-medium text-sm leading-relaxed max-w-lg">
+                        Allow your personal AI Agent to automatically perform frontend actions on your behalf, such as navigating between pages or triggering searches to improve your experience.
+                      </p>
+                    </div>
+                    <div 
+                      onClick={toggleAgentPermissions}
+                      className={`relative w-14 h-8 rounded-full p-1 cursor-pointer transition-colors duration-300 shrink-0 ${agentPermissionsEnabled ? "bg-primary" : "bg-muted border border-border"}`}
+                    >
+                      <div 
+                        className={`w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-300 ${agentPermissionsEnabled ? "translate-x-6" : "translate-x-0"}`}
+                      />
+                    </div>
                   </div>
                 </motion.div>
               )}

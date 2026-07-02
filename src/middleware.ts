@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   const isAuthRoute = ['/auth/login', '/auth/signup'].some(route => pathname.startsWith(route));
 
   // 0. Locked Routes (Coming Soon)
-  const lockedRoutes = ['/agent', '/checkout'];
+  const lockedRoutes = ['/checkout'];
   const isLockedRoute = lockedRoutes.some(route => pathname.startsWith(route));
   
   if (isLockedRoute && !pathname.startsWith('/coming-soon')) {
@@ -40,8 +40,10 @@ export function middleware(request: NextRequest) {
 
     // B. Redirect away from auth routes if already logged in
     if (isAuthRoute) {
-      if (!profileCompleted) return NextResponse.redirect(new URL('/get-started', request.url));
-      const dest = userRole === 'seller' ? '/seller/dashboard' : `/explore-interests/${encodeURIComponent(userEmail || '')}`;
+      if (isProfileTrulyIncomplete) return NextResponse.redirect(new URL('/get-started', request.url));
+      const dest = userRole === 'seller' 
+        ? '/seller/dashboard' 
+        : userEmail ? `/explore-interests/${encodeURIComponent(userEmail)}` : '/get-started';
       return NextResponse.redirect(new URL(dest, request.url));
     }
 
@@ -51,12 +53,17 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/seller/dashboard', request.url));
       }
       if (userRole === 'buyer' && pathname.startsWith('/seller')) {
-        const dest = `/explore-interests/${encodeURIComponent(userEmail || '')}`;
+        const dest = userEmail ? `/explore-interests/${encodeURIComponent(userEmail)}` : '/get-started';
         return NextResponse.redirect(new URL(dest, request.url));
       }
       if (pathname.startsWith('/get-started')) {
-        const dest = userRole === 'seller' ? '/seller/dashboard' : `/explore-interests/${encodeURIComponent(userEmail || '')}`;
-        return NextResponse.redirect(new URL(dest, request.url));
+        const dest = userRole === 'seller' 
+          ? '/seller/dashboard' 
+          : userEmail ? `/explore-interests/${encodeURIComponent(userEmail)}` : '/get-started';
+        
+        if (pathname !== dest) {
+          return NextResponse.redirect(new URL(dest, request.url));
+        }
       }
     }
   }

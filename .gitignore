@@ -41,6 +41,12 @@ n8n/node_modules
 n8n/backups
 n8n/.env
 
+# agent-code microservice
+agent-code/node_modules
+agent-code/dist
+agent-code/.env
+agent-code/*.log
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

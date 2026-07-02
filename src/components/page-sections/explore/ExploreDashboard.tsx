@@ -136,8 +136,8 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
               docData.dateScraped ||
               (docData.timestamp
                 ? new Date(
-                    docData.timestamp.seconds * 1000,
-                  ).toLocaleDateString()
+                  docData.timestamp.seconds * 1000,
+                ).toLocaleDateString()
                 : new Date().toLocaleDateString()),
           } as InterestResult);
         });
@@ -343,14 +343,28 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
 
   if (loading) {
     return (
-      <div className="flex-grow flex flex-col items-center justify-center min-h-[400px]">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <Sparkles className="absolute inset-0 m-auto w-6 h-6 text-primary animate-pulse" />
+      <div className="flex flex-col gap-8 md:gap-10 animate-pulse w-full">
+        <div className="h-48 md:h-32 w-full bg-muted/80 rounded-[2rem] md:rounded-3xl" />
+        <div className="flex flex-col lg:flex-row gap-12">
+          <aside className="hidden lg:block w-80 flex-shrink-0 pr-8">
+            <div className="w-full h-[500px] bg-muted/80 rounded-[2rem]" />
+          </aside>
+          <div className="flex-grow space-y-8">
+            <div className="w-full h-14 bg-muted/80 rounded-[2rem]" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex flex-col h-[350px] bg-card/40 rounded-[2rem] border border-border/20 overflow-hidden">
+                  <div className="w-full h-48 bg-muted/80" />
+                  <div className="p-6 flex flex-col flex-grow gap-4">
+                    <div className="w-24 h-5 rounded-full bg-muted/80" />
+                    <div className="w-3/4 h-6 rounded-lg bg-muted/80" />
+                    <div className="w-1/2 h-6 rounded-lg bg-muted/80" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <p className="text-secondary font-bold tracking-[0.2em] uppercase text-[10px] mt-8 animate-pulse">
-          Retrieving Results...
-        </p>
       </div>
     );
   }
@@ -391,11 +405,10 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2.5 rounded-xl text-[11px] font-bold transition-all border ${
-                selectedCategory === cat
-                  ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/10"
-                  : "bg-background/40 border-border/60 hover:border-primary/30 text-secondary"
-              }`}
+              className={`px-4 py-2.5 rounded-xl text-[11px] font-bold transition-all border ${selectedCategory === cat
+                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/10"
+                : "bg-background/40 border-border/60 hover:border-primary/30 text-secondary"
+                }`}
             >
               {cat}
             </button>
@@ -581,21 +594,19 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
 
               <button
                 onClick={() => setViewMode("platform")}
-                className={`relative z-10 flex-1 sm:flex-none px-6 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${
-                  viewMode === "platform"
-                    ? "text-primary-foreground"
-                    : "text-secondary hover:text-foreground"
-                }`}
+                className={`relative z-10 flex-1 sm:flex-none px-6 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${viewMode === "platform"
+                  ? "text-primary-foreground"
+                  : "text-secondary hover:text-foreground"
+                  }`}
               >
                 Verified ({sellerListings.length})
               </button>
               <button
                 onClick={() => setViewMode("marketplace")}
-                className={`relative z-10 flex-1 sm:flex-none px-6 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${
-                  viewMode === "marketplace"
-                    ? "text-primary-foreground"
-                    : "text-secondary hover:text-foreground"
-                }`}
+                className={`relative z-10 flex-1 sm:flex-none px-6 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${viewMode === "marketplace"
+                  ? "text-primary-foreground"
+                  : "text-secondary hover:text-foreground"
+                  }`}
               >
                 External ({results.length})
               </button>
@@ -649,11 +660,10 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.05em] transition-all border ${
-                    selectedCategory === cat
-                      ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/10"
-                      : "bg-muted/40 border-border/40 text-secondary"
-                  }`}
+                  className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.05em] transition-all border ${selectedCategory === cat
+                    ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/10"
+                    : "bg-muted/40 border-border/40 text-secondary"
+                    }`}
                 >
                   {cat}
                 </button>
@@ -671,7 +681,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
               <FilterPanel isSidebar />
             </div>
 
-            <div className="p-6 rounded-[2rem] bg-muted/20 border border-border/40 space-y-5">
+            <div className="p-6 rounded-[2rem] bg-muted/50 border border-border/40 space-y-5">
               <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-secondary/50">
                 Market Intelligence
               </h4>
@@ -694,64 +704,64 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
             onlyNew ||
             hasGallery ||
             sortBy !== "newest") && (
-            <div className="flex flex-wrap items-center gap-3">
-              {searchTerm && (
-                <Chip
-                  icon={Search}
-                  label={`Search: ${searchTerm}`}
-                  onClear={() => setSearchTerm("")}
-                />
-              )}
-              {selectedCategory !== "All" && (
-                <Chip
-                  label={`Category: ${selectedCategory}`}
-                  onClear={() => setSelectedCategory("All")}
-                />
-              )}
-              {(minPrice || maxPrice) && (
-                <Chip
-                  label={`Price: ${minPrice || "0"} - ${maxPrice || "∞"}`}
-                  onClear={() => {
-                    setMinPrice("");
-                    setMaxPrice("");
-                  }}
-                />
-              )}
-              {locationTerm && (
-                <Chip
-                  icon={MapPin}
-                  label={`Near: ${locationTerm}`}
-                  onClear={() => setLocationTerm("")}
-                />
-              )}
-              {onlyNew && (
-                <Chip
-                  icon={Sparkles}
-                  label="Recent Only"
-                  onClear={() => setOnlyNew(false)}
-                />
-              )}
-              {hasGallery && (
-                <Chip
-                  icon={Image}
-                  label="With Gallery"
-                  onClear={() => setHasGallery(false)}
-                />
-              )}
-              {sortBy !== "newest" && (
-                <Chip
-                  label={`Sorted: ${sortBy === "price-asc" ? "Price ↑" : "Price ↓"}`}
-                  onClear={() => setSortBy("newest")}
-                />
-              )}
-              <button
-                onClick={resetAll}
-                className="text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:text-primary transition-colors ml-3 border-b border-border/60 pb-0.5"
-              >
-                Clear Selection
-              </button>
-            </div>
-          )}
+              <div className="flex flex-wrap items-center gap-3">
+                {searchTerm && (
+                  <Chip
+                    icon={Search}
+                    label={`Search: ${searchTerm}`}
+                    onClear={() => setSearchTerm("")}
+                  />
+                )}
+                {selectedCategory !== "All" && (
+                  <Chip
+                    label={`Category: ${selectedCategory}`}
+                    onClear={() => setSelectedCategory("All")}
+                  />
+                )}
+                {(minPrice || maxPrice) && (
+                  <Chip
+                    label={`Price: ${minPrice || "0"} - ${maxPrice || "∞"}`}
+                    onClear={() => {
+                      setMinPrice("");
+                      setMaxPrice("");
+                    }}
+                  />
+                )}
+                {locationTerm && (
+                  <Chip
+                    icon={MapPin}
+                    label={`Near: ${locationTerm}`}
+                    onClear={() => setLocationTerm("")}
+                  />
+                )}
+                {onlyNew && (
+                  <Chip
+                    icon={Sparkles}
+                    label="Recent Only"
+                    onClear={() => setOnlyNew(false)}
+                  />
+                )}
+                {hasGallery && (
+                  <Chip
+                    icon={Image}
+                    label="With Gallery"
+                    onClear={() => setHasGallery(false)}
+                  />
+                )}
+                {sortBy !== "newest" && (
+                  <Chip
+                    label={`Sorted: ${sortBy === "price-asc" ? "Price ↑" : "Price ↓"}`}
+                    onClear={() => setSortBy("newest")}
+                  />
+                )}
+                <button
+                  onClick={resetAll}
+                  className="text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:text-primary transition-colors ml-3 border-b border-border/60 pb-0.5"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            )}
 
           {/* Results Grid */}
           <div className="space-y-14">
@@ -800,11 +810,10 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
                             <button
                               key={pageNum}
                               onClick={() => setCurrentPage(pageNum)}
-                              className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black transition-all border ${
-                                isCurrent
-                                  ? "bg-foreground text-background border-foreground shadow-xl shadow-foreground/10"
-                                  : "bg-background border-border/60 hover:border-primary text-secondary"
-                              }`}
+                              className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black transition-all border ${isCurrent
+                                ? "bg-foreground text-background border-foreground shadow-xl shadow-foreground/10"
+                                : "bg-background border-border/60 hover:border-primary text-secondary"
+                                }`}
                             >
                               {pageNum}
                             </button>
@@ -843,7 +852,7 @@ export default function ExploreDashboard({ email }: ExploreDashboardProps) {
               </>
             ) : (
               <div className="py-40 flex flex-col items-center justify-center text-center space-y-8">
-                <div className="w-28 h-28 rounded-[3rem] bg-muted/20 border border-border/40 flex items-center justify-center">
+                <div className="w-28 h-28 rounded-[3rem] bg-muted/50 border border-border/40 flex items-center justify-center">
                   <FilterX className="w-12 h-12 text-secondary/20" />
                 </div>
                 <div className="space-y-3">

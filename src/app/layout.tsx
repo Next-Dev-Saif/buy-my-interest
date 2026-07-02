@@ -22,6 +22,9 @@ export const metadata: Metadata = {
 
 import { ThemeProvider } from "@/components/globals/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { FrontToolsProvider } from "@/context/FrontToolsProvider";
+import { AgentChatProvider } from "@/context/AgentChatContext";
+import FloatingAgentButton from "@/components/globals/FloatingAgentButton";
 
 export default function RootLayout({
   children,
@@ -33,7 +36,12 @@ export default function RootLayout({
       <body className="font-poppins min-h-screen flex flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <AuthProvider>
-            {children}
+            <AgentChatProvider>
+              <FrontToolsProvider>
+                {children}
+                <FloatingAgentButton />
+              </FrontToolsProvider>
+            </AgentChatProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
